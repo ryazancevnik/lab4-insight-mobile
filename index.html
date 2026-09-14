@@ -1,0 +1,896 @@
+<meta charset="utf-8">
+<title>Мобильный Lab4 Insight</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap">
+<style>
+  /* ===== Токены дизайн-системы Lab4U, имена из ДИЗАЙН_СИСТЕМА_Lab4U.md (основной файл ⚙️ Design System) ===== */
+  :root {
+    --brand-base: #00AACC;            /* Brand/Base */
+    --brand-bg: #00AACC1F;            /* Brand/BG */
+    --text-a100: #030204;             /* Text & Icon/Black Inverse/A100 */
+    --text-a56: #0302048F;            /* Text & Icon/Black Inverse/A56 */
+    --text-a32: #03020452;            /* Text & Icon/Black Inverse/A32 */
+    --text-white: #FFFFFF;            /* Text & Icon/Fixed/White/A100 */
+    --stroke-a12: #0302041F;          /* Stroke/Black Inverse/A12 */
+    --stroke-a4: #0302040A;           /* Stroke/Black Inverse/A4 */
+    --wrapper-a4: #0302040A;          /* Wrapper/Black Inverse/A4 */
+    --wrapper-a6: #0302040F;          /* Wrapper/Black Inverse/A6 */
+    --wrapper-a12: #0302041F;         /* Wrapper/Black Inverse/A12 */
+    --bg-base: #F1F2F4;               /* Background/BG/Base */
+    --surface-base: #FFFFFF;          /* Background/Surface/Base */
+    --modals-base: #FFFFFF;           /* Background/Modals/Base */
+    --overlay: #03020452;             /* Overlay/Base */
+    --success: #00CC84;               /* RGB/Status/Success/Base */
+    --success-bg: #00CC841F;          /* RGB/Status/Success/BG */
+    --warning: #FFA500;               /* RGB/Status/Warning/Base */
+    --negative: #EF5350;              /* RGB/Status/Negative/Base: «ниже» и «выше» референса */
+    --negative-bg: #EF53501F;         /* RGB/Status/Negative/BG */
+    --mono-700: #778197;              /* MONO/700: «у границы», решение прототипа */
+    --mono-100: #EBECF0;              /* MONO/100 */
+    --mono-150: #E2E4E9;              /* MONO/150, Stroke/Base */
+    --seg-ok: #77DD77; --seg-off: #F07A73; --seg-edge: #B1B7C3;      /* заливки карточек показателей, решение 10.09 */
+    --seg-ok-line: #3D9440; --seg-off-line: #B84A42; --seg-edge-line: #6C7484;
+    --r-4: 4px; --r-8: 8px; --r-12: 12px; --r-20: 20px; --r-24: 24px;   /* Radius/radius-* */
+    --s-4: 4px; --s-6: 6px; --s-8: 8px; --s-10: 10px; --s-12: 12px; --s-16: 16px; --s-20: 20px; --s-24: 24px; --s-32: 32px; --s-40: 40px;
+    --shadow-600: 0 16px 32px #0302041F, 0 4px 12px -4px #0302041F;   /* shadow/600 */
+    --effects-menu: 0 8px 30px #30393A1A;                               /* effects/Menu */
+    --font: "Roboto", -apple-system, "Segoe UI", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg-base); color: var(--text-a100); font: 16px/24px var(--font); }
+  body.noscroll { overflow: hidden; }
+  p, h1, h2, h3, h4, ul, ol { margin: 0; }
+  button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; padding: 0; }
+  input { font: inherit; color: inherit; }
+  .num { font-variant-numeric: tabular-nums; }
+  [hidden] { display: none !important; }
+
+  /* типографика, роли набора NEW */
+  .t-6xl { font-size: 32px; line-height: 40px; font-weight: 700; text-wrap: balance; }
+  .t-4xl { font-size: 24px; line-height: 32px; font-weight: 700; text-wrap: balance; }
+  .t-3xl { font-size: 20px; line-height: 24px; font-weight: 700; text-wrap: balance; }
+  .t-2xl { font-size: 18px; line-height: 24px; font-weight: 700; }
+  .t-xl  { font-size: 16px; line-height: 24px; font-weight: 600; }
+  .t-l   { font-size: 14px; line-height: 20px; font-weight: 600; }
+  .b-xl  { font-size: 16px; line-height: 24px; font-weight: 400; }
+  .b-l   { font-size: 14px; line-height: 20px; font-weight: 400; }
+  .b-m   { font-size: 12px; line-height: 16px; font-weight: 400; }
+  .caps  { font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; }
+  .muted { color: var(--text-a56); }
+
+  /* раскладка: mobile first, на широком экране колонка до 640 */
+  .app { max-width: 640px; margin: 0 auto; padding: 0 var(--s-16) 160px; }
+  .stack { display: flex; flex-direction: column; gap: var(--s-8); }
+  .sec { margin: var(--s-32) var(--s-4) var(--s-12); }
+  .meta { margin: var(--s-8) var(--s-4) 0; }
+  .big { margin: var(--s-4) var(--s-4) 0; }
+  .sub-head { margin: var(--s-8) var(--s-4) 0; }
+  /* шапка экрана как в «Здоровье»: круглая иконка, крупный заголовок и текст по центру */
+  .head { display: flex; flex-direction: column; align-items: center; gap: var(--s-8); text-align: center; padding: var(--s-16) var(--s-8) var(--s-8); }
+  .head-ic { width: 80px; height: 80px; border-radius: 50%; background: var(--surface-base); display: grid; place-items: center; color: var(--brand-base); margin-bottom: var(--s-12); }
+  .head-ic .lt { opacity: .45; }
+  .head .b-xl { max-width: 36ch; }
+
+  /* шапка: круглые кнопки, как в «Здоровье» */
+  .appbar { position: sticky; top: 0; z-index: 5; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; padding: var(--s-8) 0; margin: 0 calc(-1 * var(--s-16)); padding-left: var(--s-16); padding-right: var(--s-16); background: #F1F2F4E6; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+  .appbar .title { text-align: center; font-size: 16px; line-height: 20px; font-weight: 600; }
+  .rbtn { width: 40px; height: 40px; border-radius: 50%; background: var(--surface-base); box-shadow: 0 2px 8px #03020414; display: grid; place-items: center; color: var(--text-a100); }
+  .rbtn:hover { opacity: .8; } .rbtn:active { opacity: .7; }
+  .rbtn.ghost { visibility: hidden; }
+
+  /* карточки */
+  .card { background: var(--surface-base); border-radius: var(--r-20); padding: var(--s-16); }
+  .card + .card, .card + .act, .act + .act, .act + .card { margin-top: var(--s-12); }
+  .what > * + * { margin-top: var(--s-12); }
+  .what > p.t-l { margin: var(--s-24) var(--s-4) var(--s-8); }
+  .what > p.t-l + * { margin-top: 0; }
+  .tap { display: block; width: 100%; text-align: left; cursor: pointer; }
+  .tap:active { opacity: .85; }
+  .cat { display: flex; align-items: center; gap: var(--s-8); margin-bottom: var(--s-6); }
+  .cat .dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 10px; font-weight: 700; flex: none; }
+  .cat .chev { margin-left: auto; color: var(--text-a32); display: grid; }
+  .st-off { color: var(--negative); } .bg-off { background: var(--negative); }
+  .st-edge { color: var(--mono-700); } .bg-edge { background: var(--mono-700); }
+  .st-exp, .st-ok { color: var(--success); } .bg-exp, .bg-ok { background: var(--success); }
+  .st-brand { color: var(--brand-base); } .bg-brand { background: var(--brand-base); }
+
+  /* шкала референса: ниже нормы 0–25 %, норма 25–75 %, выше 75–100 % */
+  .scale { position: relative; height: 8px; border-radius: 4px; background: var(--mono-100); margin: var(--s-16) 0 var(--s-6); }
+  .scale .z { position: absolute; top: 0; bottom: 0; left: 25%; right: 25%; background: #00CC8447; }
+  .scale .m { position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 1px 4px #0302044D; transform: translateX(-50%); }
+  .scale-l { position: relative; height: 16px; font-size: 12px; line-height: 16px; color: var(--text-a56); }
+  .scale-l span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+
+  /* чипы превью содержимого */
+  .chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-6); margin-top: var(--s-12); }
+  .chips .ch { font-size: 12px; line-height: 16px; padding: 4px 10px; border-radius: 999px; background: var(--wrapper-a6); }
+  .chips .ch.hot { background: var(--brand-bg); color: var(--brand-base); font-weight: 600; }
+  .chips .go { margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: var(--brand-bg); color: var(--brand-base); display: grid; place-items: center; }
+
+  /* кнопки: buttonAccent LG, состояния прозрачностью 100/80/70/35 */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-8); min-height: 48px; padding: 12px 16px; border-radius: var(--r-12); font-size: 16px; line-height: 24px; font-weight: 600; background: var(--brand-base); color: var(--text-white); width: 100%; text-align: center; }
+  .btn:hover { opacity: .8; } .btn:active { opacity: .7; } .btn:disabled { opacity: .35; cursor: not-allowed; }
+  .btn.on { background: var(--brand-bg); color: var(--brand-base); box-shadow: inset 0 0 0 1.5px var(--brand-base); }
+  .btn.on:hover { opacity: 1; }
+  .btn-sec { background: var(--wrapper-a6); color: var(--text-a100); }
+  .btn-sm { min-height: 40px; padding: 10px 16px; border-radius: var(--r-8); font-size: 14px; line-height: 20px; width: auto; }
+  .link { color: var(--brand-base); font-weight: 500; }
+  .link:hover { opacity: .8; }
+  .opt { flex: 1; min-height: 48px; border-radius: var(--r-12); background: var(--wrapper-a6); font-weight: 600; font-size: 16px; }
+  .opt:hover { opacity: .8; } .opt:active { opacity: .7; }
+  .opt[aria-pressed="true"] { background: var(--brand-base); color: var(--text-white); }
+  .opts { display: flex; gap: var(--s-8); margin-top: var(--s-12); }
+  .opts.wrap { flex-wrap: wrap; } .opts.wrap .opt { flex: 1 1 auto; padding: 0 var(--s-16); min-height: 40px; border-radius: var(--r-8); font-size: 14px; }
+  :focus-visible { outline: 2px solid var(--brand-base); outline-offset: 2px; }
+
+  /* карточка действия: иконка, суть, содержание, кнопка */
+  .act { background: var(--surface-base); border-radius: var(--r-20); padding: var(--s-16); display: grid; grid-template-columns: 40px 1fr; gap: var(--s-12); }
+  .act .body { min-width: 0; display: flex; flex-direction: column; gap: var(--s-8); }
+  .act .ttl { font-size: 18px; line-height: 24px; font-weight: 700; }
+  .act .lead { font-size: 15px; line-height: 22px; }
+  .act .cta { margin-top: var(--s-4); }
+  .ic { width: 40px; height: 40px; border-radius: 50%; background: var(--wrapper-a6); display: grid; place-items: center; color: var(--text-a100); flex: none; }
+  .ic.brand { background: var(--brand-bg); color: var(--brand-base); }
+  .list { padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--s-6); }
+  .list li { list-style: none; display: grid; grid-template-columns: 14px 1fr; gap: var(--s-8); font-size: 15px; line-height: 22px; }
+  .list li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--brand-base); margin: 8px 0 0 4px; }
+  .stub { font-size: 12px; line-height: 16px; color: var(--text-a56); border-top: 1px dashed var(--stroke-a12); padding-top: var(--s-8); }
+  .note { background: var(--brand-bg); border-radius: var(--r-12); padding: var(--s-8) var(--s-12); font-size: 14px; line-height: 20px; }
+
+  /* кольцо покрытия */
+  .ring { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+  .ring i { width: 30px; height: 30px; border-radius: 50%; background: var(--surface-base); display: grid; place-items: center; font-style: normal; font-weight: 600; font-size: 11px; line-height: 12px; color: var(--text-a100); }
+  .ring.sm { width: 32px; height: 32px; } .ring.sm i { width: 24px; height: 24px; font-size: 10px; }
+
+  /* лента карточек показателей, перенесена из v3.5 */
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 120px; gap: 6px; margin: var(--s-4) calc(-1 * var(--s-16)) 0 0; padding: 0 var(--s-16) 6px 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .seg::-webkit-scrollbar { display: none; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .sg { position: relative; min-height: 120px; border-radius: var(--r-12); background: var(--surface-base); padding: 10px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; line-height: 15px; box-shadow: inset 0 0 0 1px var(--stroke-a12); }
+  .sg b { font-weight: 600; }
+  .sg .v { margin-top: auto; padding-top: 6px; font-size: 15px; line-height: 18px; font-weight: 700; display: flex; flex-direction: column; }
+  .sg .v small { font-size: 11px; line-height: 14px; font-weight: 400; opacity: .75; }
+  .sg.has { box-shadow: none; }
+  .sg.has.s-ok { background: var(--seg-ok); --cb: var(--seg-ok-line); }
+  .sg.has.s-low, .sg.has.s-high { background: var(--seg-off); --cb: var(--seg-off-line); }
+  .sg.has.s-edge { background: var(--seg-edge); --cb: var(--seg-edge-line); }
+  .sg .cb { width: 16px; height: 16px; border-radius: var(--r-4); border: 1px solid var(--stroke-a12); background: var(--surface-base); display: inline-grid; place-content: center; margin-bottom: 2px; flex: none; }
+  .sg .cb.done { background: #fff; border: 1.5px solid var(--cb); }
+  .sg .cb.done::after, .sg.on .cb::after { content: ""; width: 8px; height: 5px; border: 2px solid var(--cb, var(--brand-base)); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
+  .sg.pick { cursor: pointer; } .sg.pick:hover { box-shadow: inset 0 0 0 1px var(--brand-base); }
+  .sg.pick:focus-within { outline: 2px solid var(--brand-base); outline-offset: 2px; }
+  .sg.on { background: var(--brand-base); color: var(--text-white); box-shadow: none; --cb: var(--brand-base); }
+  .sg.on .cb { background: #fff; border-color: #fff; }
+  .foot { display: grid; gap: var(--s-12); margin-top: var(--s-8); }
+
+  /* строки списка: List/Cell */
+  .cells { background: var(--surface-base); border-radius: var(--r-20); overflow: hidden; }
+  .cell { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--s-12); min-height: 52px; padding: var(--s-8) var(--s-16); border-top: 1px solid var(--stroke-a4); }
+  .cell:first-child { border-top: 0; }
+  .cell .nm { display: flex; align-items: center; gap: var(--s-8); }
+  .cell .dot8 { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .cell .val { text-align: right; }
+  .cell .val input { width: 72px; text-align: right; border: 1px solid transparent; border-radius: var(--r-8); padding: 2px 6px; background: transparent; font-weight: 600; }
+  .cell .val input:focus { border-color: var(--brand-base); background: var(--bg-base); outline: none; }
+  .row-tog { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: var(--s-12); min-height: 56px; padding: var(--s-8) var(--s-16); text-align: left; }
+  .row-tog:active { background: var(--wrapper-a4); }
+
+  /* этапы разбора: itemCheck */
+  .ich { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px 14px; border-radius: var(--r-12); background: var(--wrapper-a4); font-size: 14px; line-height: 20px; color: var(--text-a56); }
+  .ich + .ich { margin-top: var(--s-8); }
+  .ich .ck { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--stroke-a12); display: grid; place-items: center; color: #fff; flex: none; }
+  .ich.done { color: var(--text-a100); } .ich.done .ck { background: var(--success); border-color: var(--success); }
+
+  /* опросник на сводке */
+  .qcard { background: var(--surface-base); border-radius: var(--r-20); padding: var(--s-16); box-shadow: inset 0 0 0 1.5px var(--brand-base); }
+  .qcard .top { display: flex; justify-content: space-between; margin-bottom: var(--s-8); }
+  .qcard .bars { display: flex; gap: 4px; margin-bottom: var(--s-12); }
+  .qcard .bars i { flex: 1; height: 4px; border-radius: 2px; background: var(--mono-150); }
+  .qcard .bars i.on { background: var(--brand-base); }
+  .qcard .why { display: flex; justify-content: space-between; gap: var(--s-12); margin-top: var(--s-12); }
+  .qdone { display: flex; align-items: center; gap: var(--s-12); }
+
+  /* скелетоны: единственная анимация */
+  .skel { border-radius: var(--r-20); padding: var(--s-16); box-shadow: inset 0 0 0 1px var(--stroke-a12); display: grid; grid-template-columns: 40px 1fr; gap: var(--s-12); }
+  .sk { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--wrapper-a6) 0%, var(--wrapper-a12) 50%, var(--wrapper-a6) 100%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; }
+  .sk.circle { width: 40px; height: 40px; border-radius: 50%; }
+  .sk + .sk { margin-top: 8px; }
+  @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+  @media (prefers-reduced-motion: reduce) { .sk { animation: none; background: var(--wrapper-a6); } }
+
+  /* главное на экране отклонения */
+  .hero { text-align: center; padding: var(--s-16) var(--s-8) var(--s-8); }
+  .hero .v { font-size: 48px; line-height: 56px; font-weight: 700; }
+  .hero .pill { display: inline-block; margin-top: var(--s-8); font-size: 14px; line-height: 20px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
+  .pill.st-off { background: var(--negative-bg); } .pill.st-edge { background: var(--mono-100); } .pill.st-exp { background: var(--success-bg); }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-12); }
+  .duo .hero .v { font-size: 36px; line-height: 44px; }
+  .causes { padding: 0; margin: 0; counter-reset: c; display: flex; flex-direction: column; gap: var(--s-12); }
+  .causes li { list-style: none; counter-increment: c; display: grid; grid-template-columns: 24px 1fr; gap: var(--s-8); }
+  .causes li::before { content: counter(c); width: 24px; height: 24px; border-radius: 50%; background: var(--wrapper-a6); display: grid; place-items: center; font-size: 12px; font-weight: 600; }
+  .causes li.new::before { background: var(--brand-base); color: #fff; }
+  .src { display: block; margin-top: 2px; }
+
+  /* нижняя панель: downBar */
+  .bar { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: min(640px, 100%); z-index: 10; background: var(--modals-base); border-radius: var(--r-24) var(--r-24) 0 0; box-shadow: var(--effects-menu); padding: var(--s-12) var(--s-16) calc(var(--s-12) + env(safe-area-inset-bottom)); display: grid; gap: var(--s-8); }
+  .bar .sum { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-8); }
+
+  /* шторка: bottomSheet */
+  .veil { position: fixed; inset: 0; background: var(--overlay); z-index: 20; }
+  .sheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: min(640px, 100%); max-height: 90vh; overflow-y: auto; z-index: 21; background: var(--modals-base); border-radius: var(--r-24) var(--r-24) 0 0; box-shadow: var(--shadow-600); padding: 0 var(--s-16) calc(var(--s-16) + env(safe-area-inset-bottom)); }
+  .sheet .handle { display: flex; justify-content: center; padding: 9px 0; }
+  .sheet .handle i { width: 41px; height: 6px; border-radius: var(--r-8); background: var(--text-a32); }
+  .sheet .shead { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s-12); margin: var(--s-8) 0 var(--s-16); }
+  .field { display: grid; gap: var(--s-4); margin-bottom: var(--s-12); }
+  .field input { min-height: 48px; padding: 12px 16px; border-radius: var(--r-12); border: 0; background: var(--bg-base); }
+  .field input:focus { outline: 2px solid var(--brand-base); }
+  .line { display: flex; justify-content: space-between; gap: var(--s-12); padding: var(--s-12) 0; border-top: 1px solid var(--stroke-a4); }
+  .line:first-child { border-top: 0; }
+
+  /* выбор анализа, вход Б */
+  .ord { display: grid; grid-template-columns: 40px 1fr 20px; gap: var(--s-12); align-items: center; width: 100%; text-align: left; padding: var(--s-12) var(--s-16); border-top: 1px solid var(--stroke-a4); }
+  .ord:first-child { border-top: 0; }
+  .ord:active { background: var(--wrapper-a4); }
+  .ord .when { display: flex; align-items: center; gap: var(--s-8); }
+  .badge { font-size: 12px; line-height: 16px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--brand-base); color: var(--text-white); }
+
+  /* старт */
+  .scn { display: grid; grid-template-columns: 40px 1fr 20px; gap: var(--s-12); align-items: center; }
+</style>
+
+<div class="app" id="app"></div>
+<div id="bar"></div>
+<div id="sheet"></div>
+
+<script>
+/* ============================ ИКОНКИ (временные, до SVG от Виктора) ============================ */
+const ICONS = {
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  more: '<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>',
+  chev: '<path d="M9 5l7 7-7 7"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  doctor: '<path d="M6 3v6a5 5 0 0010 0V3"/><path d="M11 14v2a4 4 0 008 0v-3"/><circle cx="19" cy="11" r="2"/>',
+  dna: '<path d="M8 3c0 5 8 5 8 9s-8 4-8 9"/><path d="M16 3c0 5-8 5-8 9s8 4 8 9"/><path d="M9.5 7h5M9.5 17h5"/>',
+  pill: '<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l5 5"/>',
+  leaf: '<path d="M5 19c0-8 6-14 14-14 0 8-6 14-14 14z"/><path d="M5 19l7-7"/>',
+  refresh: '<path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 5v6h-6"/>',
+  spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+  question: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 0c0 1.7-2.5 2-2.5 4"/><path d="M12 17h.01"/>',
+  protein: '<path d="M4 17c3-6 13-6 16 0"/><path d="M8 13c1-4 7-4 8 0"/><circle cx="12" cy="7" r="2"/>',
+  file: '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  bell: '<path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 004 0"/>',
+};
+// Крупные двухтоновые иконки для шапки экрана, временные до SVG от Виктора
+const HERO = {
+  scan: '<path d="M12 6h15l9 9v10"/><path d="M36 36v4a2 2 0 01-2 2H12a2 2 0 01-2-2V8a2 2 0 012-2"/><path d="M27 6v9h9"/><path class="lt" d="M16 21h12M16 27h7M16 33h5"/><circle cx="32" cy="32" r="6"/><path d="M36.5 36.5l5 5"/>',
+  tubes: '<path d="M15 8v25a5 5 0 0010 0V8"/><path d="M12 8h16"/><path class="lt" d="M15 22h10"/><path class="lt" d="M31 13v20a5 5 0 0010 0V13"/><path class="lt" d="M28 13h16"/>',
+  check: '<rect x="11" y="9" width="26" height="33" rx="3"/><path d="M18 9V6h12v3"/><path class="lt" d="M17 26l5 5 9-10"/>',
+  drop: '<path d="M24 5c6.5 8.5 13 15 13 22.5a13 13 0 01-26 0C11 20 17.5 13.5 24 5z"/><path class="lt" d="M15 30h5l2.5-5 3.5 9 2.5-4H33"/>',
+  history: '<path d="M9 24a15 15 0 104.4-10.6"/><path d="M9 8v7h7"/><path class="lt" d="M24 16v9l6 4"/>',
+};
+function heroIcon(name) {
+  return `<svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HERO[name]}</svg>`;
+}
+function headHTML(ic, title, text, meta) {
+  return `<div class="head"><span class="head-ic">${heroIcon(ic)}</span><h1 class="t-6xl">${title}</h1><p class="b-xl">${text}</p>${meta ? `<p class="b-m muted">${meta}</p>` : ''}</div>`;
+}
+function icon(name, size = 20) {
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+}
+
+/* ============================ ДАННЫЕ ============================ */
+// Каталог: stub — цена условная, не из фактуры v2
+const CATALOG = {
+  cbc:            { name: 'Общий анализ крови с лейкоцитарной формулой', price: 780 },
+  esr:            { name: 'СОЭ', price: 210, stub: true },
+  ferritin:       { name: 'Ферритин', price: 420, stub: true },
+  iron_serum:     { name: 'Железо сывороточное', price: 210, stub: true },
+  transferrin:    { name: 'Трансферрин', price: 375, stub: true },
+  tibc:           { name: 'ОЖСС', price: 375, stub: true },
+  crp:            { name: 'С-реактивный белок', price: 375 },
+  albumin:        { name: 'Альбумин', price: 240 },
+  protein_total:  { name: 'Общий белок', price: 210 },
+  protein_status: { name: 'Белковый статус', price: 1200, stub: true },
+};
+const BLOOD_DRAW = 280;
+
+const IND = {
+  hb:      { name: 'Гемоглобин', unit: 'г/дл', buy: 'cbc' },
+  rbc:     { name: 'Эритроциты', unit: 'млн/мкл', buy: 'cbc' },
+  hct:     { name: 'Гематокрит', unit: '%', buy: 'cbc' },
+  mcv:     { name: 'Средний объём эритроцитов', short: 'Объём эритроцитов', unit: 'фл', buy: 'cbc' },
+  mch:     { name: 'Среднее содержание Hb в эритроците', short: 'Hb в эритроците', unit: 'пг', buy: 'cbc' },
+  mchc:    { name: 'Средняя концентрация Hb в эритроците', short: 'Концентрация Hb', unit: 'г/дл', buy: 'cbc' },
+  rdw:     { name: 'Гетерогенность эритроцитов по объёму', short: 'Разброс эритроцитов', unit: '%', buy: 'cbc' },
+  plt:     { name: 'Тромбоциты', unit: 'тыс/мкл', buy: 'cbc' },
+  wbc:     { name: 'Лейкоциты', unit: 'тыс/мкл', buy: 'cbc' },
+  neut_p:  { name: 'Нейтрофилы', unit: '%', buy: 'cbc' },
+  neut_a:  { name: 'Нейтрофилы абс.', unit: 'тыс/мкл', buy: 'cbc' },
+  lymph_p: { name: 'Лимфоциты', unit: '%', buy: 'cbc' },
+  lymph_a: { name: 'Лимфоциты абс.', unit: 'тыс/мкл', buy: 'cbc' },
+  mono_p:  { name: 'Моноциты', unit: '%', buy: 'cbc' },
+  mono_a:  { name: 'Моноциты абс.', unit: 'тыс/мкл', buy: 'cbc' },
+  eos_p:   { name: 'Эозинофилы', unit: '%', buy: 'cbc' },
+  eos_a:   { name: 'Эозинофилы абс.', unit: 'тыс/мкл', buy: 'cbc' },
+  baso_p:  { name: 'Базофилы', unit: '%', buy: 'cbc' },
+  baso_a:  { name: 'Базофилы абс.', unit: 'тыс/мкл', buy: 'cbc' },
+  esr:     { name: 'СОЭ', unit: 'мм/ч', buy: 'esr' },
+  ferritin:{ name: 'Ферритин', unit: 'нг/мл', buy: 'ferritin' },
+  iron_serum: { name: 'Железо сывороточное', short: 'Железо сыворотки', unit: 'мкмоль/л', buy: 'iron_serum' },
+  transferrin:{ name: 'Трансферрин', unit: 'г/л', buy: 'transferrin' },
+  tibc:    { name: 'ОЖСС', unit: 'мкмоль/л', buy: 'tibc' },
+  crp:     { name: 'С-реактивный белок', unit: 'мг/л', buy: 'crp' },
+  albumin: { name: 'Альбумин', unit: 'г/л', buy: 'albumin' },
+  protein_total: { name: 'Общий белок', unit: 'г/л', buy: 'protein_total' },
+};
+
+// Панели каталога: состав и название условные, сверить с каталогом Lab4U
+const PANELS = {
+  anemia:       { name: 'Анемия и запасы железа', etalon: ['hb', 'mcv', 'ferritin', 'iron_serum', 'transferrin', 'tibc'], stub: true,
+                  why: 'Железо, трансферрин и ОЖСС вместе покажут, дефицит это или железо не усваивается. По одному ферритину сказать нельзя.',
+                  whyClean: 'Железо, трансферрин и ОЖСС дополнят ферритин из истории: будет видно не только запасы, но и как железо переносится.' },
+  inflammation: { name: 'Воспаление', etalon: ['wbc', 'neut_p', 'lymph_p', 'esr', 'crp'],
+                  why: 'С-реактивный белок отличит следы воспаления от индивидуальной нормы.',
+                  whyClean: 'С-реактивный белок дополнит лейкоциты и СОЭ: вместе они дают полную картину.' },
+};
+
+// Общий анализ крови из прогона A1 (мужчина, 34)
+function cbcMale(clean) {
+  return [
+    ['hb', 14.9, [13.2, 17.3]], ['rbc', 5.03, [4.3, 5.7]], ['hct', 44, [39, 49]], ['mcv', 87.5, [80, 99]],
+    ['mch', 29.6, [27, 34]], ['mchc', 33.9, [32, 37]], ['rdw', 12.6, [11.6, 14.8]], ['plt', 232, [150, 400]],
+    ['wbc', 6.06, [4.5, 11]], clean ? ['neut_p', 52, [48, 78]] : ['neut_p', 46.2, [48, 78], 'edge'], ['neut_a', 2.8, [1.78, 5.38]],
+    clean ? ['lymph_p', 34, [19, 37]] : ['lymph_p', 38, [19, 37], 'edge'], ['lymph_a', 2.3, [1.32, 3.57]], ['mono_p', 10.4, [3, 11]], ['mono_a', 0.63, [0.2, 0.95]],
+    ['eos_p', 4.6, [1, 5]], ['eos_a', 0.29, [0, 0.7]], ['baso_p', 0.8, [0, 1]], ['baso_a', 0.05, [0, 0.2]], ['esr', 5, [0, 15]],
+  ];
+}
+function toInd(rows) {
+  return rows.map(([code, value, ref, st]) => ({ code, value, ref, status: st || (value < ref[0] ? 'low' : value > ref[1] ? 'high' : 'ok') }));
+}
+const EXTRA_S1 = [['ferritin', 18, [30, 400]], ['albumin', 34, [35, 52]], ['protein_total', 64, [64, 83], 'edge']];
+
+// Системы организма: тексты для сценария 1; сценарий 3 подменяет их прошедшим временем
+const SYSTEMS = {
+  iron: {
+    name: 'Железо', icon: 'Fe', codes: ['ferritin'], context: ['hb', 'mcv'], panel: 'anemia',
+    head: 'Ферритин 18 при норме от 30: запасы снижены умеренно',
+    meaning: 'Ферритин показывает запасы железа. 18 при нижней границе 30 значит, что запасы снижены умеренно. Гемоглобин 14,9 в норме: кислород кровь переносит, а резерва мало.',
+    causes: [
+      { ifSym: 'fatigue', text: 'Усталость при таком ферритине ожидаема: это признак сниженных запасов, а не отдельная проблема.', src: 'клинреки по железодефицитным состояниям' },
+      { text: 'Мало железа в питании или оно плохо усваивается: растительное питание, гастрит, приём обезболивающих.', src: 'клинреки по железодефицитным состояниям' },
+      { text: 'Скрытые потери через желудок и кишечник: у мужчин это первое, что исключает врач.', src: 'клинреки по железодефицитной анемии' },
+      { text: 'Донорство крови или большие нагрузки в последние месяцы.', src: 'клинреки по железодефицитной анемии' },
+    ],
+    doctorQs: ['Нужен ли препарат железа и в какой форме?', 'Стоит ли проверить желудок и кишечник?', 'Через сколько недель пересдать ферритин?'],
+    questions: ['fatigue', 'returned'],
+  },
+  protein: {
+    name: 'Белки', icon: 'Б', codes: ['albumin', 'protein_total'], context: [], panel: null, check: 'protein_status',
+    head: 'Альбумин 34 при норме от 35, общий белок на нижней границе',
+    meaning: 'Альбумин и общий белок показывают, хватает ли организму белка. Альбумин чуть ниже нормы, общий белок на самой границе. Отдельно это небольшое отклонение, но вместе с низким ферритином похоже, что не хватает питания или усвоения.',
+    checkText: 'Белковый статус покажет, хватает ли белка и как он усваивается.',
+    causes: [
+      { ifSym: 'diet', text: 'Вы отметили, что едите мало белковой еды: это самая частая причина такого альбумина.', src: 'клинреки по белково-энергетической недостаточности' },
+      { text: 'Мало белка в питании, особенно на диете или при растительном питании.', src: 'клинреки по белково-энергетической недостаточности' },
+      { text: 'Белок плохо усваивается: гастрит, болезни кишечника.', src: 'клинреки по белково-энергетической недостаточности' },
+      { text: 'Реже потери белка через почки: это проверяет врач по анализу мочи.', src: 'клинреки по хронической болезни почек' },
+    ],
+    doctorQs: ['Связаны ли низкий альбумин и низкий ферритин?', 'Менять питание или проверить усвоение?'],
+    questions: ['diet'],
+  },
+  immune: {
+    name: 'Иммунитет', icon: 'L', codes: ['neut_p', 'lymph_p'], context: ['wbc', 'neut_a', 'lymph_a'], panel: 'inflammation',
+    expectedIf: 'infection',
+    head: 'Соотношение лейкоцитов чуть сдвинуто, так бывает после простуды',
+    headExp: 'Сдвиг лейкоцитов ожидаем после недавней простуды',
+    meaning: 'Нейтрофилов в процентах чуть меньше границы, лимфоцитов чуть больше, а абсолютные числа обоих в норме. Это одна картина, а не два отклонения, и чаще она временная: так выглядит кровь 2–4 недели после простуды.',
+    expected: 'Вы отметили недавнюю простуду. После вирусной инфекции доля нейтрофилов на 2–4 недели снижается, а лимфоцитов растёт: для этого срока это ожидаемо.',
+    causes: [
+      { ifSym: 'colds', text: 'Частые простуды при таком соотношении бывают при нехватке белка: из него строятся иммунные клетки.', src: 'клинреки по белково-энергетической недостаточности' },
+      { text: 'Недавняя вирусная инфекция, в том числе перенесённая без температуры: соотношение меняется на 2–4 недели.', src: 'клинреки по интерпретации общего анализа крови' },
+      { text: 'Индивидуальная норма: у части здоровых людей соотношение постоянно у границы.', src: 'клинреки по интерпретации общего анализа крови' },
+    ],
+    doctorQs: ['Нужно ли что-то делать, если ничего не беспокоит?'],
+    questions: ['colds'],
+  },
+};
+
+// Уточняющие вопросы: порядок в опроснике совпадает с порядком ключей
+const QUESTIONS = {
+  fatigue:  { sys: 'iron', text: 'Бывает ли в последние месяцы усталость, сонливость или одышка на лестнице?', why: 'Уточнит, почему снижены запасы железа' },
+  returned: { sys: 'iron', after: 'fatigue', text: 'Дефицит железа уже находили раньше, и он вернулся после курса препаратов?', why: 'Если дефицит возвращается, причина может быть в усвоении' },
+  diet:     { sys: 'protein', text: 'Худеете сейчас или едите мало мяса, рыбы, яиц, творога?', why: 'Уточнит, почему альбумин ниже нормы' },
+  colds:    { sys: 'immune', text: 'Простуды чаще четырёх раз в год или царапины заживают медленно?', why: 'Уточнит, связан ли сдвиг лейкоцитов с иммунитетом', skipIf: a => a.infection === 'Да' },
+};
+
+// Вопросы на проверке распознавания вместо анкеты
+const CHECK_QS = [
+  { id: 'iron_meds', q: 'Принимаете ли препараты железа или витамины с железом?', why: 'меняет чтение ферритина', opts: ['Нет', 'Да'] },
+  { id: 'infection', q: 'Болели ли простудой или ОРВИ за последние 3–4 недели?', why: 'меняет чтение лейкоцитов', opts: ['Нет', 'Да', 'Не помню'] },
+  { id: 'why', q: 'Зачем сдавали анализы?', why: 'меняет тон разбора', opts: ['Для себя', 'По назначению врача', 'Контроль лечения'] },
+];
+
+const SCENARIOS = {
+  1: {
+    title: 'Свежий бланк другой лаборатории', short: 'Железо, белки и лейкоциты · весь путь', ic: 'file',
+    entry: 'A', old: false, person: { sex: 'м', age: 34 }, date: '28 августа', lab: 'бланк другой лаборатории',
+    ind: toInd([...cbcMale(false), ...EXTRA_S1]), history: [], systems: ['iron', 'protein', 'immune'],
+    summary: 'Запасов железа мало, и белка на нижней границе: вместе это похоже на недостаток питания или усвоения. Лейкоциты сдвинуты, скорее всего временно.',
+    summaryInfection: 'Запасов железа мало, и белка на нижней границе: вместе это похоже на недостаток питания или усвоения. Сдвиг лейкоцитов ожидаем после недавней простуды.',
+    doctorQs: ['Связаны ли низкий ферритин и низкий альбумин, и что с этим делать?', 'Нужен ли препарат железа и в какой форме?', 'Стоит ли проверить желудок и кишечник, если железо и белок не усваиваются?'],
+  },
+  2: {
+    title: 'Свои анализы в Lab4U', short: 'Выбор анализа · отклонений нет · что добрать', ic: 'user',
+    entry: 'B', old: false, person: { sex: 'м', age: 34 }, date: '21 августа', lab: 'сдача в Lab4U',
+    ind: toInd(cbcMale(true)), history: [{ code: 'ferritin', value: 64, ref: [30, 400], date: '2 июля 2026' }], systems: [],
+    orders: [
+      { id: 'o1', date: '21 августа 2026', name: 'Общий анализ крови с лейкоцитарной формулой', n: 20, main: true },
+      { id: 'o2', date: '2 июля 2026', name: 'Ферритин', n: 1 },
+      { id: 'o3', date: '14 марта 2026', name: 'Витамин D, 25-OH', n: 1 },
+      { id: 'o4', date: '9 декабря 2025', name: 'Общий анализ крови с лейкоцитарной формулой', n: 20 },
+    ],
+    summary: 'Все 20 показателей в норме, ферритин из истории от 2 июля тоже. Ниже то, чего в картине пока нет: две панели почти собраны.',
+    doctorQs: [],
+  },
+  3: {
+    title: 'Бланк 2023 года', short: 'Тот же бланк · разбор в прошедшем времени', ic: 'clock',
+    entry: 'A', old: true, ago: 'три с половиной года', bigOld: 'Картина на март 2023', person: { sex: 'м', age: 34 }, date: '12 марта 2023', lab: 'бланк другой лаборатории',
+    ind: toInd([...cbcMale(false), ...EXTRA_S1]), history: [], systems: ['iron', 'protein', 'immune'],
+    summary: 'Тогда запасов железа было мало, белок был на нижней границе, лейкоциты чуть сдвинуты. Что сейчас, этот бланк не скажет: прошло три с половиной года.',
+    doctorQs: [],
+    past: {
+      iron: { head: 'В марте 2023 ферритин был 18 при норме от 30', meaning: 'Тогда запасы железа были снижены умеренно, гемоглобин 14,9 был в норме. Какие запасы сейчас, по этому бланку сказать нельзя.' },
+      protein: { head: 'Альбумин был 34 при норме от 35, общий белок на границе', meaning: 'Тогда белка было на нижней границе. Изменилось ли это за три года, покажет только свежий анализ.' },
+      immune: { head: 'Соотношение лейкоцитов было чуть сдвинуто', meaning: 'Такое соотношение обычно временное, и три года спустя оно ничего не говорит о сегодняшнем состоянии.' },
+    },
+  },
+};
+
+/* ============================ СОСТОЯНИЕ И ПОМОЩНИКИ ============================ */
+const state = { scenario: null, screen: 'start', sys: null, sheet: null, answers: {}, sym: {}, picked: new Set(), skipped: new Set(),
+                genOpen: false, normOpen: false, stagesDone: 0, uploadTimer: false, stub: {}, summaryY: 0 };
+const S = () => SCENARIOS[state.scenario];
+
+function fmt(n) { return n.toLocaleString('ru-RU'); }
+function fv(v) { return String(v).replace('.', ','); }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function plural(n, one, few, many) { const a = n % 10, b = n % 100; return n + ' ' + (a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many); }
+const indOf = (sc, code) => sc.ind.find(i => i.code === code);
+const statusOf = i => i.status;
+const isOff = st => st === 'low' || st === 'high';
+
+function counts(sc) {
+  const total = sc.ind.length;
+  const below = sc.ind.filter(i => isOff(i.status)).length;
+  const edge = sc.ind.filter(i => i.status === 'edge').length;
+  return { total, below, edge, ok: total - below - edge };
+}
+function sysStatus(sc, id) {
+  const s = SYSTEMS[id];
+  if (!sc.old && s.expectedIf && state.answers[s.expectedIf] === 'Да') return 'exp';
+  return s.codes.some(c => isOff(indOf(sc, c).status)) ? 'off' : 'edge';
+}
+function statusWord(st, old) {
+  const w = { off: 'ниже нормы', edge: 'у границы', exp: 'в пределах ожидаемого', low: 'ниже нормы', high: 'выше нормы', ok: 'в норме' }[st];
+  return old && st !== 'ok' ? 'было ' + w : w;
+}
+function coverage(panelId, sc) {
+  const have = [], miss = [];
+  PANELS[panelId].etalon.forEach(code => {
+    const i = indOf(sc, code), h = sc.history.find(x => x.code === code);
+    if (i) have.push({ code, value: i.value, status: i.status });
+    else if (h) have.push({ code, value: h.value, status: 'ok', date: h.date });
+    else miss.push(code);
+  });
+  return { have, miss, total: PANELS[panelId].etalon.length };
+}
+function covered(panelId, sc) {
+  if (sc.old) return PANELS[panelId].etalon.filter(c => state.picked.has(IND[c].buy)).length;
+  const cv = coverage(panelId, sc);
+  return cv.have.length + cv.miss.filter(c => state.picked.has(IND[c].buy)).length;
+}
+function buyList(panelId, sc) {
+  const cv = coverage(panelId, sc);
+  const codes = sc.old ? PANELS[panelId].etalon : cv.miss;
+  return [...new Set(codes.map(c => IND[c].buy))];
+}
+function applicableQs(sc) {
+  if (sc.old) return [];
+  return Object.keys(QUESTIONS).filter(id => {
+    const q = QUESTIONS[id];
+    if (!sc.systems.includes(q.sys)) return false;
+    if (q.after && state.sym[q.after] !== 'Да') return false;
+    if (q.skipIf && q.skipIf(state.answers)) return false;
+    return true;
+  });
+}
+function nextQ(sc) { return applicableQs(sc).find(id => state.sym[id] == null && !state.skipped.has(id)) || null; }
+function chainState(ids) {
+  if (ids.some(id => state.sym[id] === 'Нет' || state.skipped.has(id))) return 'no';
+  if (ids.every(id => state.sym[id] === 'Да')) return 'yes';
+  return 'pending';
+}
+function cartSum() { let s = 0; state.picked.forEach(c => { s += CATALOG[c].price; }); return s; }
+
+/* ============================ КОМПОНЕНТЫ ============================ */
+function appBar(title, back = true) {
+  return `<header class="appbar">${back ? `<button class="rbtn" data-back aria-label="Назад">${icon('back')}</button>` : '<span class="rbtn ghost"></span>'}<p class="title">${title}</p><button class="rbtn" aria-label="Ещё">${icon('more')}</button></header>`;
+}
+// Шкала: ниже нормы 0–25 %, норма 25–75 %, выше 75–100 %
+function scalePos(v, [lo, hi]) {
+  if (v < lo) return Math.max(2, v / lo * 25);
+  if (v > hi) return Math.min(98, 75 + (v - hi) / (hi * 0.5) * 25);
+  return 25 + (v - lo) / (hi - lo) * 50;
+}
+function scaleHTML(i, st) {
+  const p = scalePos(i.value, i.ref);
+  const col = isOff(st) || st === 'off' ? 'bg-off' : st === 'exp' ? 'bg-exp' : st === 'ok' ? 'bg-ok' : 'bg-edge';
+  return `<div class="scale" aria-label="${esc(IND[i.code].name)} ${fv(i.value)}, норма ${fv(i.ref[0])}–${fv(i.ref[1])}"><span class="z"></span><span class="m ${col}" style="left:${p}%"></span></div>
+    <div class="scale-l num"><span style="left:25%">${fv(i.ref[0])}</span><span style="left:75%">${fv(i.ref[1])}</span></div>`;
+}
+function ringHTML(have, total, sm = false) {
+  const pct = Math.round(have / total * 100);
+  const col = pct === 100 ? 'var(--success)' : 'var(--warning)';
+  const bg = pct === 0 ? 'var(--mono-150)' : `conic-gradient(${col} 0 ${pct}%, var(--mono-150) ${pct}% 100%)`;
+  return `<span class="ring${sm ? ' sm' : ''}" style="background:${bg}" aria-label="картина панели: ${have} из ${total}"><i class="num">${have}/${total}</i></span>`;
+}
+function chipsHTML(id, sc) {
+  const s = SYSTEMS[id];
+  const nc = s.causes.filter(c => !c.ifSym).length;
+  const nq = applicableQs(sc).filter(q => QUESTIONS[q].sys === id).length;
+  const na = sysStatus(sc, id) === 'exp' ? 0 : s.panel ? buyList(s.panel, sc).length : (s.check && !sc.old ? 1 : 0);
+  const parts = [`<span class="ch">${plural(nc, 'причина', 'причины', 'причин')}</span>`];
+  if (nq) parts.push(`<span class="ch hot">${plural(nq, 'вопрос', 'вопроса', 'вопросов')}</span>`);
+  if (na) parts.push(`<span class="ch">${plural(na, 'анализ', 'анализа', 'анализов')}</span>`);
+  return `<div class="chips">${parts.join('')}<span class="go">${icon('chev', 18)}</span></div>`;
+}
+function sysText(sc, id) {
+  const s = SYSTEMS[id], p = sc.past && sc.past[id];
+  const st = sysStatus(sc, id);
+  return { head: p ? p.head : st === 'exp' ? s.headExp : s.head, meaning: p ? p.meaning : st === 'exp' ? s.expected : s.meaning };
+}
+function catHTML(id, sc, chev = true) {
+  const st = sysStatus(sc, id);
+  return `<div class="cat st-${st}"><span class="dot bg-${st}">${SYSTEMS[id].icon}</span><span class="t-l">${SYSTEMS[id].name} · ${statusWord(st, sc.old)}</span>${chev ? `<span class="chev">${icon('chev', 18)}</span>` : ''}</div>`;
+}
+function sysCard(id, sc) {
+  const s = SYSTEMS[id], st = sysStatus(sc, id), t = sysText(sc, id);
+  const main = indOf(sc, s.codes[0]);
+  return `<button class="card tap" data-sys="${id}">${catHTML(id, sc, false)}<p class="t-xl">${t.head}</p>${scaleHTML(main, st)}${chipsHTML(id, sc)}</button>`;
+}
+
+// Лента карточек показателей панели
+function segStrip(panelId, sc) {
+  const cv = coverage(panelId, sc); const seen = new Set();
+  const cells = PANELS[panelId].etalon.map(code => {
+    const h = cv.have.find(x => x.code === code); const buy = IND[code].buy; const nm = IND[code].short || IND[code].name;
+    if (h && !sc.old) return `<div class="sg has s-${h.status}" title="${esc(IND[code].name)}"><span class="cb done" aria-hidden="true"></span><b>${nm}</b><span class="v num">${fv(h.value)} ${IND[code].unit}${h.date ? '<small>' + h.date + '</small>' : ''}</span></div>`;
+    const on = state.picked.has(buy); const dup = seen.has(buy); seen.add(buy);
+    const price = dup ? '<small>в том же анализе</small>' : `${fmt(CATALOG[buy].price)} ₽${h ? '<small>заново</small>' : ''}`;
+    return `<label class="sg pick${on ? ' on' : ''}" title="${esc(IND[code].name)}"><input type="checkbox" class="sr-only" data-item="${buy}" ${on ? 'checked' : ''} aria-label="${esc(IND[code].name)}"><span class="cb" aria-hidden="true"></span><b>${nm}</b><span class="v num">${price}</span></label>`;
+  });
+  return `<div class="seg">${cells.join('')}</div>`;
+}
+function panelCTA(panelId, sc) {
+  const list = buyList(panelId, sc); const sum = list.reduce((s, c) => s + CATALOG[c].price, 0);
+  const all = list.length && list.every(c => state.picked.has(c));
+  const label = sc.old ? `Сдать заново · ${fmt(sum)} ₽` : `Досдать ${plural(list.length, 'анализ', 'анализа', 'анализов')} · ${fmt(sum)} ₽`;
+  return all ? `<button class="btn on" data-unpick="${list.join(',')}">${icon('check', 18)} ${plural(list.length, 'анализ', 'анализа', 'анализов')} в заказе</button>`
+             : `<button class="btn" data-pick="${list.join(',')}">${label}</button>`;
+}
+
+/* ============================ ЭКРАНЫ ============================ */
+function vStart() {
+  return `<div style="padding-top:var(--s-40)">
+    <p class="caps muted meta">Прототип · данные условные</p>
+    <h1 class="t-6xl big">Lab4 Insight</h1>
+    <p class="b-xl muted sub-head">Мобильная концепция расшифровки одного бланка. Выберите сценарий.</p>
+    <h2 class="t-3xl sec">Сценарии</h2>
+    ${[1, 2, 3].map(n => `<button class="card tap" data-scn="${n}"><div class="scn"><span class="ic brand">${icon(SCENARIOS[n].ic)}</span><div><p class="t-xl">${SCENARIOS[n].title}</p><p class="b-l muted">${SCENARIOS[n].short}</p></div><span class="muted">${icon('chev', 18)}</span></div></button>`).join('')}
+    <p class="b-m muted" style="margin:var(--s-24) var(--s-4) 0">Чего нет в прототипе: оформления заказа дальше суммы, настоящей регистрации, переходов в Медорию, генетику, Metsora и BionMax дальше заглушки.</p>
+  </div>`;
+}
+
+function vUpload() {
+  const sc = S();
+  const stages = ['Файл получен, бланк читается', `Распознали ${plural(sc.ind.length, 'показатель', 'показателя', 'показателей')}`, `Сверили с референсами для мужчины ${sc.person.age} лет`];
+  return `${appBar('Расшифровка')}
+    ${headHTML('scan', 'Разбираем бланк', 'Обычно это около минуты. Страницу можно закрыть: покажем, как только закончим.')}
+    <div style="margin-top:var(--s-24)">${stages.map((s, i) => `<div class="ich${i < state.stagesDone ? ' done' : ''}"><span class="ck">${i < state.stagesDone ? icon('check', 14) : ''}</span><span>${s}</span></div>`).join('')}</div>
+    <p class="b-m muted" style="margin:var(--s-16) var(--s-4) 0">${state.stagesDone >= 3 ? 'Готово. Открываем показатели, чтобы вы проверили распознавание.' : 'Разбираем результаты одной сдачи, для людей старше 18 лет. Документ после разбора удаляется.'}</p>`;
+}
+
+function vOrders() {
+  const sc = S();
+  return `${appBar('Расшифровка')}
+    ${headHTML('tubes', 'Какой анализ разобрать?', 'Ваши результаты в Lab4U. Разбор строится по одной сдаче, пол и возраст возьмём из профиля.')}
+    <div class="cells" style="margin-top:var(--s-24)">${sc.orders.map((o, i) => `<button class="ord" data-order="${o.id}">
+      <span class="ic brand">${icon('file')}</span>
+      <span><span class="when"><span class="b-m muted num">${o.date}</span>${i === 0 ? '<span class="badge">Новый</span>' : ''}</span>
+        <span class="t-l" style="display:block;margin-top:2px">${o.name}</span>
+        <span class="b-m muted">${plural(o.n, 'показатель', 'показателя', 'показателей')}</span>
+        ${state.stub['order' + o.id] ? '<span class="stub" style="display:block;margin-top:6px">Заглушка: в прототипе разбор есть только для сдачи 21 августа.</span>' : ''}</span>
+      <span class="muted">${icon('chev', 18)}</span></button>`).join('')}</div>`;
+}
+
+function vCheck() {
+  const sc = S(); const isA = sc.entry === 'A';
+  const off = sc.ind.filter(i => isOff(i.status)).concat(sc.ind.filter(i => i.status === 'edge')); const ok = sc.ind.filter(i => i.status === 'ok');
+  const cell = i => {
+    const st = i.status; const col = st === 'ok' ? 'var(--success)' : st === 'edge' ? 'var(--mono-700)' : 'var(--negative)';
+    return `<div class="cell"><div><div class="nm"><span class="dot8" style="background:${col}"></span><span class="b-l">${IND[i.code].name}</span></div><p class="b-m muted num" style="margin-left:16px">норма ${fv(i.ref[0])}–${fv(i.ref[1])} ${IND[i.code].unit}${st !== 'ok' ? ' · ' + statusWord(st) : ''}</p></div><div class="val num">${isA ? `<input data-val="${i.code}" value="${fv(i.value)}" aria-label="${esc(IND[i.code].name)}" inputmode="decimal">` : `<b>${fv(i.value)}</b>`}</div></div>`;
+  };
+  return `${appBar('Проверка')}
+    ${headHTML('check', isA ? 'Проверьте, что распознали верно' : 'Ваши показатели',
+      isA ? `Нашли ${plural(sc.ind.length, 'показатель', 'показателя', 'показателей')}. Если что-то распознали неточно, нажмите на значение и поправьте.` : 'Общий анализ крови от 21 августа. Пол и возраст взяты из профиля.',
+      `${sc.date} · ${sc.lab} · мужчина, ${sc.person.age} года`)}
+    ${off.length ? `<h2 class="t-3xl sec">Отличаются от нормы</h2><div class="cells">${off.map(cell).join('')}</div>` : ''}
+    <h2 class="t-3xl sec">${off.length ? 'В норме' : 'Все в норме'}</h2><div class="cells">${ok.map(cell).join('')}</div>
+    ${isA ? `<h2 class="t-3xl sec">Три вопроса вместо анкеты</h2><p class="b-l muted sub-head" style="margin:-4px var(--s-4) var(--s-12)">Можно не отвечать, но ответы уточнят разбор.</p>
+      ${CHECK_QS.map(q => `<div class="card"><p class="t-xl">${q.q}</p><p class="b-m muted">${q.why}</p><div class="opts${q.opts.length > 2 ? ' wrap' : ''}">${q.opts.map(o => `<button class="opt" data-q="${q.id}" data-a="${o}" aria-pressed="${state.answers[q.id] === o}">${o}</button>`).join('')}</div></div>`).join('')}` : ''}`;
+}
+
+function vSummary() {
+  const sc = S(); const c = counts(sc);
+  const infection = state.answers.infection === 'Да';
+  const person = `мужчина, ${sc.person.age} года`;
+  let big, line;
+  if (sc.old) { big = sc.bigOld; line = `Тогда ${plural(c.below, 'показатель', 'показателя', 'показателей')} были ниже нормы, ${c.edge} у границы, остальные ${c.ok} из ${c.total} в норме.`; }
+  else if (!c.below && !c.edge) { big = 'Отклонений нет'; line = `Все ${plural(c.total, 'показатель', 'показателя', 'показателей')} в норме. Ниже то, что дополнит картину.`; }
+  else { big = 'Ваш разбор'; line = `${plural(c.below, 'показатель', 'показателя', 'показателей')} ниже нормы, ${c.edge} у границы, остальные ${c.ok} из ${c.total} в норме.`; }
+  const meta = `${sc.date} · ${sc.lab} · ${person}`;
+  const control = state.answers.why === 'Контроль лечения' ? `<p class="note" style="margin-top:var(--s-12)">Вы отметили контроль лечения: разбор не заменяет оценку лечащего врача, покажите ему результат.</p>` : '';
+  const hasSys = sc.systems.length > 0;
+  return `${appBar('Расшифровка')}
+    ${headHTML(sc.old ? 'history' : 'drop', big, line, meta)}
+    <div class="card" style="margin-top:var(--s-16)"><div class="cat st-brand"><span class="dot bg-brand">${icon('spark', 12)}</span><span class="t-l">Общий вывод</span></div><p class="t-xl">${infection && sc.summaryInfection ? sc.summaryInfection : sc.summary}</p>${control}</div>
+    ${hasSys ? `<h2 class="t-3xl sec">Что это значит</h2>${sc.systems.map(id => sysCard(id, sc)).join('')}` : ''}
+    ${hasSys && !sc.old ? `<div style="margin-top:var(--s-24)">${qCard(sc)}</div>` : ''}
+    <h2 class="t-3xl sec">${sc.old ? 'Что обновить' : hasSys ? 'Что делать' : 'Чего не хватает до полной картины'}</h2>
+    <div class="what">${whatToDo(sc)}</div>
+    <div class="cells" style="margin-top:var(--s-24)">${normList(sc)}</div>
+    <p class="b-m muted" style="margin:var(--s-24) var(--s-4) 0">Разбор носит рекомендательный характер и не заменяет консультацию врача. Состав панелей и формулировки — заглушка до медицинской редакции.</p>`;
+}
+
+// Опросник по одному вопросу на сводке
+function qCard(sc) {
+  const all = applicableQs(sc); if (!all.length) return '';
+  const cur = nextQ(sc);
+  if (!cur) {
+    const n = all.filter(id => state.sym[id] != null).length;
+    return `<div class="card qdone"><span class="ic" style="background:var(--success);color:#fff">${icon('check')}</span><div style="flex:1"><p class="t-xl">Разбор уточнён</p><p class="b-l muted">${n ? 'Ответы учтены в причинах и в том, что делать' : 'Вопросы пропущены, разбор по общим данным'}</p></div><button class="link b-l" data-reset>Изменить</button></div>`;
+  }
+  const k = all.indexOf(cur) + 1, n = all.length; const q = QUESTIONS[cur];
+  return `<div class="qcard" id="qcard">
+    <div class="top"><span class="caps st-brand">Уточните разбор</span><span class="b-m muted num">${k} из ${n}</span></div>
+    <div class="bars">${all.map((_, i) => `<i class="${i < k ? 'on' : ''}"></i>`).join('')}</div>
+    <p class="t-2xl">${q.text}</p>
+    <div class="opts"><button class="opt" data-sym="${cur}" data-a="Да">Да</button><button class="opt" data-sym="${cur}" data-a="Нет">Нет</button></div>
+    <div class="why"><span class="b-m muted">${q.why}</span><button class="link b-m" data-skip="${cur}">Пропустить</button></div>
+  </div>`;
+}
+
+function actCard({ id, ic, icClass = '', kind, title, lead, list = [], note, meta, cta, stubKey, stubText }) {
+  return `<div class="act"${id ? ` id="${id}"` : ''}><span class="ic ${icClass}">${ic}</span><div class="body">
+    <p class="caps muted">${kind}</p><p class="ttl">${title}</p>
+    ${lead ? `<p class="lead">${lead}</p>` : ''}
+    ${list.length ? `<ul class="list">${list.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
+    ${note ? `<p class="note">${note}</p>` : ''}
+    ${meta ? `<p class="b-m muted">${meta}</p>` : ''}
+    <div class="cta">${cta}</div>
+    ${stubKey && state.stub[stubKey] ? `<p class="stub">${stubText}</p>` : ''}
+  </div></div>`;
+}
+function actPanel(panelId, sc) {
+  const cv = coverage(panelId, sc); const p = PANELS[panelId];
+  const title = sc.old ? `Обновить панель «${p.name}» и проверить изменения` : `Досдать панель «${p.name}»`;
+  const lead = sc.old ? 'Все показатели заново: те, что были в бланке, и те, которых в нём не было. Покажет, изменились ли запасы за три года.'
+    : `Есть ${cv.have.length} из ${cv.total} показателей, ${cv.miss.length === 1 ? 'нужен ещё один' : 'нужны ещё ' + ({ 2: 'два', 3: 'три', 4: 'четыре' }[cv.miss.length] || cv.miss.length)}. ${sc.systems.length ? p.why : p.whyClean}`;
+  return `<div class="act" id="act-${panelId}"><span>${ringHTML(covered(panelId, sc), cv.total)}</span><div class="body">
+    <p class="caps muted">${sc.old ? 'Обновить анализы' : 'Досдать анализы'}</p><p class="ttl">${title}</p><p class="lead">${lead}</p>
+    ${segStrip(panelId, sc)}
+    <div class="foot">${panelCTA(panelId, sc)}${p.stub ? '<p class="b-m muted">Состав панели условный, до сверки с каталогом</p>' : ''}</div>
+  </div></div>`;
+}
+function actDoctor(sc) {
+  return actCard({ id: 'act-doctor', ic: icon('doctor'), icClass: 'brand', kind: 'Врач', title: 'Терапевт онлайн',
+    lead: 'При низком ферритине и альбумине препарат и дозу подбирает врач. На приёме он ответит на вопросы из вашего разбора:',
+    list: sc.doctorQs, meta: 'Медория · 30 минут · бланк и ваши ответы уходят врачу заранее',
+    cta: `<button class="btn" data-stub="doctor">Записаться к терапевту</button>`, stubKey: 'doctor',
+    stubText: 'Заглушка: переход в Медорию, профиль терапевт, бланк и ответы прикреплены к записи.' });
+}
+function actProtein() {
+  const on = state.picked.has('protein_status');
+  return actCard({ ic: icon('protein'), kind: 'Белковый статус', title: 'Проверить белки крови',
+    lead: 'Альбумин 34 ниже нормы. Белковый статус покажет:',
+    list: ['хватает ли белка при вашем питании', 'усваивается ли он или теряется', 'связано ли это с низкими запасами железа'],
+    note: state.sym.diet === 'Да' ? 'Вы отметили, что едите мало белковой еды: статус покажет, сколько не хватает.' : '',
+    meta: '4 анализа · 1 200 ₽ · цена условная · для демо',
+    cta: `<button class="btn${on ? ' on' : ''}" data-toggle="protein_status">${on ? icon('check', 18) + ' Белковый статус в заказе' : 'Добавить в заказ · 1 200 ₽'}</button>` });
+}
+function actRetest() {
+  return actCard({ ic: icon('refresh'), kind: 'Пересдать', title: 'Общий анализ крови через 5 недель',
+    lead: 'Для лейкоцитов покупать сейчас ничего не нужно: за это время соотношение возвращается к обычному. Срок из клинрек.',
+    cta: retestBtn(), stubKey: 'retest',
+    stubText: 'Пришлём напоминание 13 октября, за три дня. Заглушка.' });
+}
+function retestBtn() {
+  return state.stub.retest ? `<button class="btn on" data-stub="retest">${icon('check', 18)} Напомним 16 октября</button>`
+                           : `<button class="btn" data-stub="retest">Напомнить 16 октября</button>`;
+}
+function rowsAlmost(sc, main) {
+  const rows = Object.keys(PANELS).filter(id => id !== main).map(id => {
+    const cv = coverage(id, sc); if (!cv.miss.length) return '';
+    const list = buyList(id, sc); const on = list.every(c => state.picked.has(c)); const sum = list.reduce((s, c) => s + CATALOG[c].price, 0);
+    return `<div class="cell"><div class="nm">${ringHTML(covered(id, sc), cv.total, true)}<div><p class="t-l">${PANELS[id].name} · ${cv.have.length} из ${cv.total}</p><p class="b-m muted">${list.map(c => CATALOG[c].name).join(', ')} · ${fmt(sum)} ₽</p></div></div>
+      <button class="btn btn-sm${on ? ' on' : ''}" ${on ? `data-unpick="${list.join(',')}"` : `data-pick="${list.join(',')}"`}>${on ? icon('check', 16) + ' В заказе' : 'Добавить'}</button></div>`;
+  }).join('');
+  return rows ? `<p class="t-l">Почти собранные панели</p><div class="cells">${rows}</div>` : '';
+}
+function actGenetics() {
+  const cs = chainState(['fatigue', 'returned']);
+  if (cs === 'pending') return `<div class="skel gen-skel"><span class="sk circle"></span><div><span class="sk" style="width:70%"></span><span class="sk" style="width:45%"></span><p class="b-m muted" style="margin-top:10px">Рекомендация появится после ответов в «Уточните разбор»</p></div></div>`;
+  if (cs === 'no') return '';
+  if (!state.genOpen) return `<div class="act"><span class="ic">${icon('dna')}</span><div class="body"><p class="t-xl">Возможно, часть причины в генетике</p><p class="b-l muted">Вы отметили усталость и дефицит, который возвращается после курса</p><div class="cta"><button class="btn btn-sec" data-gen>Показать</button></div></div></div>`;
+  return actCard({ ic: icon('dna'), kind: 'Генетика', title: 'Пакет «Усталость и дефициты»',
+    lead: 'Анализы крови показывают, сколько железа сейчас. Пакет отвечает, почему оно не задерживается:',
+    list: ['как организм усваивает железо из еды и из препаратов', 'нужны ли повышенные дозы B12 и фолиевой кислоты', 'есть ли наследственная особенность, из-за которой дефицит возвращается'],
+    meta: 'Lab4 Genetics · 12 900 ₽ · сдаётся один раз · для демо',
+    cta: `<button class="btn" data-stub="gen">Собрать пакет</button>`, stubKey: 'gen', stubText: 'Заглушка: переход на страницу пакета Lab4 Genetics.' });
+}
+function actMetsora() {
+  if (state.answers.iron_meds !== 'Да') return '';
+  return actCard({ ic: icon('pill'), kind: 'Приём препаратов', title: 'Отмечать приём железа в Metsora',
+    lead: 'Вы принимаете препараты. Трекер напомнит о приёме, покажет врачу, как шёл курс, и сравнит следующий ферритин с сегодняшним.',
+    meta: 'Metsora · бесплатно · вход через Lab4U ID · для демо',
+    cta: `<button class="btn" data-stub="mets">Подключить</button>`, stubKey: 'mets', stubText: 'Заглушка: переход в Metsora с этим разбором.' });
+}
+function rowBion(sc) {
+  return `<div class="cells"><button class="row-tog" data-stub="bion"><span class="nm" style="display:flex;gap:12px;align-items:center"><span class="ic" style="width:32px;height:32px">${icon('leaf', 18)}</span><span><span class="t-l" style="display:block">${sc.systems.length ? 'План питания под железо и белок' : 'План питания под ваши показатели'}</span><span class="b-m muted">BionMax · бесплатно · для демо</span></span></span><span class="muted">${icon('chev', 18)}</span></button>${state.stub.bion ? '<p class="stub" style="margin:0 16px 12px">Заглушка: переход в BionMax.</p>' : ''}</div>`;
+}
+function whatToDo(sc) {
+  if (sc.old) return actPanel('anemia', sc);
+  if (!sc.systems.length) return actPanel('anemia', sc) + actPanel('inflammation', sc) + rowBion(sc);
+  const almost = sysStatus(sc, 'immune') === 'exp' ? '' : rowsAlmost(sc, 'anemia');
+  return actPanel('anemia', sc) + actDoctor(sc) + actProtein() + actRetest() + almost + actGenetics() + actMetsora() + rowBion(sc);
+}
+function normList(sc) {
+  const ok = sc.ind.filter(i => i.status === 'ok');
+  const label = sc.systems.length ? `Остальные ${plural(ok.length, 'показатель', 'показателя', 'показателей')} ${sc.old ? 'были ' : ''}в норме` : `Все ${plural(ok.length, 'показатель', 'показателя', 'показателей')}`;
+  return `<button class="row-tog" data-norm aria-expanded="${state.normOpen}"><span class="t-xl">${label}</span><span class="link b-l">${state.normOpen ? 'Скрыть' : 'Показать'}</span></button>
+    ${state.normOpen ? ok.map(i => `<div class="cell"><span class="b-l">${IND[i.code].name}</span><span class="b-l num"><b>${fv(i.value)}</b> <span class="muted">${IND[i.code].unit} · ${fv(i.ref[0])}–${fv(i.ref[1])}</span></span></div>`).join('') : ''}`;
+}
+
+function vDetail(id) {
+  const sc = S(); const s = SYSTEMS[id]; const st = sysStatus(sc, id); const t = sysText(sc, id);
+  const hero = code => { const i = indOf(sc, code); const ist = st === 'exp' ? 'exp' : isOff(i.status) ? 'off' : i.status === 'edge' ? 'edge' : 'ok';
+    return `<div><div class="hero"><p class="caps muted">${IND[code].name}</p><p class="v num">${fv(i.value)}</p><p class="b-l muted">${IND[code].unit} · норма ${fv(i.ref[0])}–${fv(i.ref[1])}</p><span class="pill st-${ist}">${statusWord(ist === 'off' ? i.status : ist, sc.old)}</span></div>${scaleHTML(i, ist === 'off' ? i.status : ist)}</div>`; };
+  const heroes = s.codes.length > 1 ? `<div class="duo">${s.codes.map(hero).join('')}</div>` : hero(s.codes[0]);
+  const qs = sc.old || st === 'exp' ? [] : applicableQs(sc).filter(q => QUESTIONS[q].sys === id);
+  const causes = s.causes.map(c => {
+    if (!c.ifSym) return `<li><div><p class="b-xl">${c.text}</p><span class="b-m muted src">Источник: ${c.src} · <a class="link" href="#" onclick="return false">Читать клинреки</a></span></div></li>`;
+    if (sc.old) return '';
+    const a = state.sym[c.ifSym];
+    if (a === 'Да') return `<li class="new"><div><p class="b-xl">${c.text}</p><span class="b-m muted src">Источник: ${c.src} · <a class="link" href="#" onclick="return false">Читать клинреки</a></span></div></li>`;
+    if (a == null && !state.skipped.has(c.ifSym) && applicableQs(sc).includes(c.ifSym)) return `<li><div style="padding-top:4px"><span class="sk" style="width:85%"></span><span class="sk" style="width:55%"></span><span class="b-m muted src" style="margin-top:8px">Ещё одна причина появится после ответа на вопрос выше</span></div></li>`;
+    return '';
+  }).join('');
+  let check = '';
+  if (st === 'exp') check = `<div class="card"><p class="t-3xl" style="margin-bottom:var(--s-8)">Что проверить</p><p class="b-xl">Сейчас ничего покупать не нужно. Через 5 недель пересдайте общий анализ крови: соотношение должно вернуться к обычному.</p><div class="foot">${retestBtn()}${state.stub.retest ? '<p class="stub">Пришлём напоминание 13 октября, за три дня. Заглушка.</p>' : ''}</div></div>`;
+  else if (s.panel) check = `<div class="card"><p class="t-3xl" style="margin-bottom:var(--s-8)">Что проверить</p><p class="b-xl">${PANELS[s.panel].why}</p>${segStrip(s.panel, sc)}<div class="foot">${panelCTA(s.panel, sc)}</div></div>`;
+  else if (s.check && !sc.old) { const on = state.picked.has(s.check); check = `<div class="card"><p class="t-3xl" style="margin-bottom:var(--s-8)">Что проверить</p><p class="b-xl">${s.checkText}</p><div class="foot"><button class="btn${on ? ' on' : ''}" data-toggle="${s.check}">${on ? icon('check', 18) + ' Белковый статус в заказе' : 'Добавить белковый статус · 1 200 ₽'}</button><p class="b-m muted">Цена условная · для демо</p></div></div>`; }
+  return `${appBar(s.name)}
+    ${heroes}
+    <div class="card" style="margin-top:var(--s-16)"><p class="t-3xl" style="margin-bottom:var(--s-8)">Что это значит</p><p class="b-xl">${t.meaning}</p></div>
+    ${qs.length ? `<div class="card"><p class="t-3xl">Уточните</p>${qs.map(q => `<div style="margin-top:var(--s-16)"><p class="t-xl">${QUESTIONS[q].text}</p><p class="b-m muted">${QUESTIONS[q].why}</p><div class="opts"><button class="opt" data-sym="${q}" data-a="Да" aria-pressed="${state.sym[q] === 'Да'}">Да</button><button class="opt" data-sym="${q}" data-a="Нет" aria-pressed="${state.sym[q] === 'Нет'}">Нет</button></div></div>`).join('')}</div>` : ''}
+    <div class="card"><p class="t-3xl" style="margin-bottom:var(--s-12)">Почему могло возникнуть</p><ol class="causes">${causes}</ol></div>
+    ${check}
+    ${s.doctorQs.length && !sc.old ? `<div class="card"><p class="t-3xl" style="margin-bottom:var(--s-8)">Что спросить у врача</p><ul class="list">${s.doctorQs.map(q => `<li>${q}</li>`).join('')}</ul>${id !== 'immune' ? `<button class="link b-l" style="margin-top:var(--s-12)" data-anchor="act-doctor">К записи к терапевту ›</button>` : ''}</div>` : ''}`;
+}
+
+/* ============================ НИЖНЯЯ ПАНЕЛЬ И ШТОРКИ ============================ */
+function bottomBar() {
+  if (state.screen === 'check') {
+    return `<div class="bar"><button class="btn" data-confirm>Всё верно, получить разбор</button></div>`;
+  }
+  if ((state.screen === 'summary' || state.screen === 'detail') && state.picked.size) {
+    const n = state.picked.size;
+    return `<div class="bar"><div class="sum"><span class="t-l">${plural(n, 'анализ', 'анализа', 'анализов')} · <span class="num">${fmt(cartSum())} ₽</span></span><span class="b-m muted num">+ взятие крови ${BLOOD_DRAW} ₽</span></div><button class="btn" data-sheet="cart">Записаться на сдачу</button></div>`;
+  }
+  return '';
+}
+function sheetRegister() {
+  return `<div class="veil" data-close></div><div class="sheet" role="dialog" aria-label="Регистрация"><div class="handle"><i></i></div>
+    <div class="shead"><div><p class="t-3xl">Разбор готов, сохраним его за вами</p><p class="b-l muted" style="margin-top:4px">Чтобы разбор не потерялся и вы вернулись к нему с любого устройства.</p></div><button class="rbtn" data-close aria-label="Закрыть">${icon('close', 18)}</button></div>
+    <div class="field"><label class="b-m muted" for="ph">Телефон</label><input id="ph" type="tel" placeholder="+7 900 000-00-00"></div>
+    <div class="field"><label class="b-m muted" for="cd">Код из СМС</label><input id="cd" inputmode="numeric" placeholder="0000"></div>
+    <button class="btn" data-register>Получить разбор</button>
+    <p class="b-m muted" style="margin-top:var(--s-8)">Заглушка: поля не проверяются.</p></div>`;
+}
+function sheetCart() {
+  const items = [...state.picked]; const sum = cartSum();
+  return `<div class="veil" data-close></div><div class="sheet" role="dialog" aria-label="Заказ"><div class="handle"><i></i></div>
+    <div class="shead"><div><p class="t-3xl">Ваш заказ</p><p class="b-l muted" style="margin-top:4px">Собран из разбора. Сумма дальше не меняется.</p></div><button class="rbtn" data-close aria-label="Закрыть">${icon('close', 18)}</button></div>
+    <div>${items.map(c => `<div class="line"><span class="b-l">${CATALOG[c].name}${CATALOG[c].stub ? ' <span class="muted">· цена условная</span>' : ''}</span><span class="b-l num">${fmt(CATALOG[c].price)} ₽</span></div>`).join('')}
+      <div class="line"><span class="b-l">Взятие крови</span><span class="b-l num">${BLOOD_DRAW} ₽</span></div>
+      <div class="line"><span class="t-xl">Итого</span><span class="t-xl num">${fmt(sum + BLOOD_DRAW)} ₽</span></div></div>
+    <button class="btn" data-stub="cartgo" style="margin-top:var(--s-8)">Выбрать медцентр и время</button>
+    ${state.stub.cartgo ? '<p class="stub" style="margin-top:8px">Заглушка: дальше корзина Lab4U без изменений.</p>' : ''}</div>`;
+}
+
+/* ============================ РЕНДЕР И НАВИГАЦИЯ ============================ */
+function render() {
+  const views = { start: vStart, orders: vOrders, upload: vUpload, check: vCheck, summary: vSummary, detail: () => vDetail(state.sys) };
+  document.getElementById('app').innerHTML = (views[state.screen] || vStart)();
+  document.getElementById('bar').innerHTML = bottomBar();
+  document.getElementById('sheet').innerHTML = state.sheet === 'register' ? sheetRegister() : state.sheet === 'cart' ? sheetCart() : '';
+  document.body.classList.toggle('noscroll', !!state.sheet);
+  if (state.screen === 'upload' && !state.uploadTimer) startUpload();
+}
+function go(screen, restore = false) { state.screen = screen; state.sheet = null; render(); window.scrollTo(0, restore ? state.summaryY : 0); }
+let uploadRun = 0;
+function startUpload() {
+  state.uploadTimer = true; const run = ++uploadRun;
+  const tick = () => {
+    if (state.screen !== 'upload' || run !== uploadRun) return;
+    state.stagesDone++; render();
+    if (state.stagesDone < 3) setTimeout(tick, 700);
+    else setTimeout(() => { if (state.screen === 'upload' && run === uploadRun) go('check'); }, 1000);
+  };
+  setTimeout(tick, 700);
+}
+function startScenario(n) {
+  const sc = SCENARIOS[n]; if (!sc.ind0) sc.ind0 = sc.ind.map(o => ({ ...o })); sc.ind = sc.ind0.map(o => ({ ...o }));
+  Object.assign(state, { scenario: n, sys: null, sheet: null, answers: {}, sym: {}, picked: new Set(), skipped: new Set(), genOpen: false, normOpen: false, stagesDone: 0, uploadTimer: false, stub: {}, summaryY: 0 });
+  go(SCENARIOS[n].entry === 'A' ? 'upload' : 'orders');
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('button, [data-close]'); if (!t) return;
+  const d = t.dataset;
+  if (d.scn) return startScenario(Number(d.scn));
+  if ('back' in d) {
+    if (state.screen === 'detail') return go('summary', true);
+    if (state.screen === 'summary') return go('start');
+    if (state.screen === 'check' && S().entry === 'B') return go('orders');
+    return go('start');
+  }
+  if (d.order) {
+    const o = S().orders.find(x => x.id === d.order);
+    if (o.main) return go('check');
+    state.stub['order' + o.id] = !state.stub['order' + o.id]; return render();
+  }
+  if (d.sys) { state.summaryY = window.scrollY; state.sys = d.sys; return go('detail'); }
+  if (d.q) { state.answers[d.q] = d.a; return render(); }
+  if (d.sym) { state.sym[d.sym] = d.a; return render(); }
+  if (d.skip) { state.skipped.add(d.skip); return render(); }
+  if ('reset' in d) { state.sym = {}; state.skipped = new Set(); state.genOpen = false; return render(); }
+  if (d.pick) { d.pick.split(',').forEach(c => state.picked.add(c)); return render(); }
+  if (d.unpick) { d.unpick.split(',').forEach(c => state.picked.delete(c)); return render(); }
+  if (d.toggle) { state.picked.has(d.toggle) ? state.picked.delete(d.toggle) : state.picked.add(d.toggle); return render(); }
+  if ('gen' in d) { state.genOpen = true; return render(); }
+  if ('norm' in d) { state.normOpen = !state.normOpen; return render(); }
+  if (d.stub) { state.stub[d.stub] = !state.stub[d.stub]; return render(); }
+  if (d.sheet) { state.sheet = d.sheet; return render(); }
+  if ('close' in d) { state.sheet = null; return render(); }
+  if ('confirm' in d) { if (S().entry === 'A') { state.sheet = 'register'; return render(); } return go('summary'); }
+  if ('register' in d) { return go('summary'); }
+  if (d.anchor) { go('summary'); const el = document.getElementById(d.anchor); if (el) el.scrollIntoView({ block: 'start' }); window.scrollBy(0, -64); }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.item) { t.checked ? state.picked.add(t.dataset.item) : state.picked.delete(t.dataset.item); return render(); }
+  if (t.dataset.val) {
+    const v = parseFloat(t.value.replace(',', '.')); const i = indOf(S(), t.dataset.val);
+    if (!isNaN(v)) { i.value = v; if (i.status !== 'edge') i.status = v < i.ref[0] ? 'low' : v > i.ref[1] ? 'high' : 'ok'; }
+    render();
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.sheet) { state.sheet = null; render(); } });
+window.addEventListener('DOMContentLoaded', render);
+</script>
