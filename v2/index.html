@@ -864,9 +864,9 @@ function vCheck() {
     ${headHTML('check', isA ? 'Проверьте, что распознали верно' : 'Ваши показатели',
       isA ? `Нашли ${plural(sc.ind.length, 'показатель', 'показателя', 'показателей')}. Если что-то распознали неточно, нажмите на значение и поправьте.` : 'Пол и возраст взяты из профиля.',
       `${dateOf()} · ${labOf()} · мужчина, ${plural(sc.person.age, 'год', 'года', 'лет')}`)}
-    ${qs}
     ${off.length ? `<h2 class="t-3xl sec">Отклонения (${off.length})</h2><div class="cells ckl">${off.map(cell).join('')}</div>` : ''}
-    <h2 class="t-3xl sec">${off.length ? 'В норме' : 'Все в норме'} (${ok.length})</h2><div class="cells ckl">${(state.checkNormOpen ? ok : ok.slice(0, 3)).map(cell).join('')}${ok.length > 3 ? `<div class="ck-more"><button class="btn btn-sec" data-normck aria-expanded="${!!state.checkNormOpen}">${state.checkNormOpen ? 'Скрыть' : 'Показать ещё ' + (ok.length - 3)}</button></div>` : ''}</div>`;
+    <h2 class="t-3xl sec">${off.length ? 'В норме' : 'Все в норме'} (${ok.length})</h2><div class="cells ckl">${(state.checkNormOpen ? ok : ok.slice(0, 3)).map(cell).join('')}${ok.length > 3 ? `<div class="ck-more"><button class="btn btn-sec" data-normck aria-expanded="${!!state.checkNormOpen}">${state.checkNormOpen ? 'Скрыть' : 'Показать ещё ' + (ok.length - 3)}</button></div>` : ''}</div>
+    ${qs}`;
 }
 
 function vSummary() {
