@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F1F2F4">
+<title>Тест шторки</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html { background: #F1F2F4; }
+  body { font: 16px/22px -apple-system, Roboto, sans-serif; color: #030204; background: #F1F2F4; min-height: 100vh; padding: 16px 16px 40px; }
+  h1 { font: 700 28px/34px -apple-system, Roboto, sans-serif; margin: 12px 0 8px; }
+  p { color: #0302048F; }
+  .v { display: block; width: 100%; text-align: left; margin-top: 12px; padding: 14px 16px; border: 0; border-radius: 16px; background: #fff; font: inherit; color: inherit; }
+  .v b { display: block; font-size: 17px; margin-bottom: 4px; }
+  .v span { font-size: 14px; color: #0302048F; }
+  .veil { position: fixed; inset: 0; background: rgba(3, 2, 4, .32); z-index: 20; }
+  .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; background: #fff; border-radius: 24px 24px 0 0; padding: 0 16px calc(24px + env(safe-area-inset-bottom)); transform: translateY(100%); }
+  .handle { display: flex; justify-content: center; padding: 9px 0 16px; touch-action: none; }
+  .handle i { width: 41px; height: 6px; border-radius: 8px; background: #03020452; }
+  .sheet h2 { font-size: 24px; line-height: 30px; margin-bottom: 8px; }
+  .sheet button.x { margin-top: 20px; width: 100%; min-height: 48px; border: 0; border-radius: 12px; background: #00AACC; color: #fff; font: 600 16px/24px -apple-system, Roboto, sans-serif; }
+</style>
+</head>
+<body>
+  <h1>Тест шторки</h1>
+  <p>Откройте каждый вариант, закройте свайпом и крестиком. Смотрите на полосу со временем и батареей вверху.</p>
+  <button class="v" data-v="A"><b>A. Затемнение плавно проявляется и гаснет</b><span>Как в первой версии</span></button>
+  <button class="v" data-v="B"><b>B. Плавно, и фон страницы меняется покадрово</b><span>Цвет страницы и полосы браузера пересчитывается каждый кадр вместе с затемнением</span></button>
+  <button class="v" data-v="C"><b>C. Затемнение без плавности</b><span>Появляется и исчезает сразу, шторка при этом едет плавно</span></button>
+  <div id="root"></div>
+<script>
+const BG = [241, 242, 244], A_MAX = 0.32, OPEN = 380, CLOSE = 260;
+const meta = document.querySelector('meta[name="theme-color"]');
+let mode = null, sheet = null, veil = null, anim = null;
+// Цвет страницы под затемнением с прозрачностью a
+function tint(a) {
+  const c = BG.map(x => Math.round(x * (1 - a) + 3 * a));
+  const hex = '#' + c.map(x => x.toString(16).padStart(2, '0')).join('');
+  document.documentElement.style.background = hex; document.body.style.background = hex; meta.setAttribute('content', hex);
+}
+function setVeil(k) { // k: 0..1 — доля полного затемнения
+  if (!veil) return;
+  if (mode === 'C') { veil.style.opacity = k > 0 ? 1 : 0; return; }
+  veil.style.opacity = k;
+  if (mode === 'B') tint(A_MAX * k);
+}
+const ease = t => 1 - Math.pow(1 - t, 3);
+function animate(from, to, ms, done) {
+  cancelAnimationFrame(anim); const t0 = performance.now(), h = sheet.offsetHeight;
+  const step = now => {
+    const t = Math.min(1, (now - t0) / ms), p = from + (to - from) * ease(t);
+    sheet.style.transform = `translateY(${(1 - p) * h}px)`; setVeil(p);
+    if (t < 1) anim = requestAnimationFrame(step); else done && done();
+  };
+  anim = requestAnimationFrame(step);
+}
+function open(v) {
+  mode = v;
+  document.getElementById('root').innerHTML = `<div class="veil"></div><div class="sheet"><div class="handle"><i></i></div><h2>Вариант ${v}</h2><p>Потяните за полоску вниз или нажмите кнопку.</p><button class="x">Закрыть</button></div>`;
+  veil = document.querySelector('.veil'); sheet = document.querySelector('.sheet');
+  setVeil(mode === 'C' ? 1 : 0);
+  if (mode === 'C') tint(A_MAX);
+  animate(0, 1, OPEN);
+  veil.onclick = close; sheet.querySelector('.x').onclick = close;
+}
+function close(fromP = 1) {
+  if (!sheet) return;
+  const p0 = typeof fromP === 'number' ? fromP : 1;
+  animate(p0, 0, CLOSE, () => { document.getElementById('root').innerHTML = ''; sheet = veil = null; tint(0); document.documentElement.style.background = ''; document.body.style.background = ''; });
+  if (mode === 'C') { /* затемнение уходит в конце вместе со шторкой */ }
+}
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => open(b.dataset.v));
+// свайп вниз
+let y0 = null, dy = 0, t0 = 0;
+document.addEventListener('touchstart', e => { if (!sheet || !e.target.closest('.sheet')) return; y0 = e.touches[0].clientY; dy = 0; t0 = Date.now(); cancelAnimationFrame(anim); }, { passive: true });
+document.addEventListener('touchmove', e => {
+  if (y0 == null) return; dy = Math.max(0, e.touches[0].clientY - y0); if (e.cancelable) e.preventDefault();
+  const h = sheet.offsetHeight, p = 1 - dy / h; sheet.style.transform = `translateY(${dy}px)`; if (mode !== 'C') setVeil(p);
+}, { passive: false });
+document.addEventListener('touchend', () => {
+  if (y0 == null) return; y0 = null; const h = sheet.offsetHeight, p = 1 - dy / h, v = dy / Math.max(1, Date.now() - t0);
+  if (dy > h * 0.3 || v > 0.6) close(p); else animate(p, 1, 250);
+});
+</script>
+</body>
+</html>
