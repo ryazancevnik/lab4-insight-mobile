@@ -347,6 +347,22 @@
   .gen .st .c.sp { border: 2.5px solid #FFFFFF59; border-top-color: #fff; animation: spin .8s linear infinite; }
   .gen .st .c.em { border: 2px solid #FFFFFF59; }
   .gen .st.dim { opacity: .6; }
+  /* сводка v3 */
+  .hl { display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--stroke-a4); }
+  .hl:first-child { border-top: 0; padding-top: 0; } .hl:last-child { padding-bottom: 0; }
+  .hl-ic { color: var(--brand-base); display: grid; padding-top: 1px; }
+  .th-card { display: block; width: 100%; text-align: left; overflow: hidden; }
+  .th-card + .th-card { margin-top: var(--s-12); }
+  .th-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; }
+  .th-t { font: 700 18px/24px var(--font); }
+  .th-row { padding: 11px 0; border-top: 1px solid var(--stroke-a4); }
+  .th-why { padding-top: 12px; border-top: 1px solid var(--stroke-a4); }
+  .cta-a { margin-top: 14px; justify-content: space-between; padding: 12px 16px; }
+  .cta-d { margin: 14px calc(-1 * var(--s-16)) calc(-1 * var(--s-16)); background: var(--brand-base); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .cta-d-arr { width: 32px; height: 32px; border-radius: 50%; background: #FFFFFF33; color: #fff; display: grid; place-items: center; flex: none; }
+  .pl-step { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--stroke-a4); }
+  .pl-step:first-child { border-top: 0; padding-top: 0; } .pl-step:last-child { padding-bottom: 0; }
+  .pl-n { width: 28px; height: 28px; border-radius: 50%; background: var(--brand-bg); color: var(--brand-base); font: 700 14px/28px var(--font); text-align: center; }
   .ich .spin { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid var(--brand-bg); border-top-color: var(--brand-base); flex: none; box-sizing: border-box; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .ich .spin { animation-duration: 2.4s; } }
@@ -624,6 +640,11 @@ const SCENARIOS = {
     entry: 'A', old: false, person: { sex: 'м', age: 34 }, date: '28 августа', lab: 'бланк другой лаборатории',
     ind: toInd([...cbcMale(false), ...EXTRA_S1]), history: [], systems: ['iron', 'protein', 'immune'],
     file: { name: 'Анализы_28.08.2026.pdf', size: '214 КБ', kind: 'pdf' },
+    highlights: [
+      ['calm', 'Срочного ничего нет', 'Отклонения небольшие, скорая помощь не нужна. Но одно стоит выяснить в ближайшие недели'],
+      ['main', 'Главное — запасы железа', 'Ферритин 18 при норме от 30, гемоглобин пока в норме. У мужчин причину ищут простыми анализами и с терапевтом'],
+      ['ok', '18 из 23 показателей в норме', 'Эритроциты, тромбоциты, общее количество лейкоцитов и другие'],
+    ],
     summary: 'Ферритин 18 при норме от 30: запасов железа меньше нормы, гемоглобин пока в норме. У мужчин в такой ситуации выясняют, куда уходит железо, — это делают простыми анализами и с терапевтом. Альбумин немного ниже нормы, доли лейкоцитов немного сдвинуты: чаще это временно.',
     summaryInfection: 'Ферритин 18 при норме от 30: запасов железа меньше нормы, гемоглобин пока в норме. У мужчин в такой ситуации выясняют, куда уходит железо, — это делают простыми анализами и с терапевтом. Альбумин немного ниже нормы, сдвиг лейкоцитов ожидаем после недавней простуды.',
     doctorQs: ['Связаны ли низкий ферритин и низкий альбумин, и что с этим делать?', 'Нужен ли препарат железа и в какой форме?', 'Стоит ли проверить желудок и кишечник, если железо и белок не усваиваются?'],
@@ -804,6 +825,50 @@ function sysText(sc, id) {
 function catHTML(id, sc, chev = true) {
   const st = sysStatus(sc, id);
   return `<div class="cat st-${st}"><span class="dot bg-${st}">${SYSTEMS[id].icon}</span><span class="t-l">${SYSTEMS[id].name} · ${sysWord(sc, id)}</span>${chev ? `<span class="chev">${icon('chev', 18)}</span>` : ''}</div>`;
+}
+// Уровень темы на сводке и наша версия причины. ⚠️ тексты на медредакцию
+const SYS_SUMMARY = {
+  iron: { level: 'attn', why: 'Похоже, железо уходит быстрее, чем поступает. Гемоглобин пока держится — значит, это ранняя стадия, до анемии. У мужчин так чаще всего бывает из-за незаметной потери крови через желудок или кишечник или из-за того, что железо плохо всасывается. Выяснить это можно несколькими анализами.' },
+  protein: { level: 'watch', why: 'Альбумин на грани нормы. Чаще такое бывает временно — после простуды или из-за условий забора крови. Но вместе с низким ферритином это может значить, что питательные вещества хуже усваиваются, поэтому стоит проверить.' },
+  immune: { level: 'watch', why: 'Похоже на след недавней вирусной инфекции: нейтрофилов чуть меньше, лимфоцитов чуть больше, а общее количество лейкоцитов в норме. Обычно это проходит само за 2–4 недели.' },
+};
+// Вариант кнопки в карточке темы: ?cta=a (серая кнопка) или ?cta=d (голубой подвал)
+const ctaVariant = () => (state.cta || new URLSearchParams(location.search).get('cta') || 'a').toLowerCase();
+function highlightsHTML(sc, infection) {
+  const ic = { calm: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>', main: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>', ok: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>' };
+  return `<h2 class="t-3xl sec">Главное</h2><div class="card">${sc.highlights.map(h => `<div class="hl"><span class="hl-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ic[h[0]]}</svg></span><div><p class="t-l">${h[1]}</p><p class="b-m muted" style="margin-top:2px">${h[2]}</p></div></div>`).join('')}</div>`;
+}
+function themeCTA(id, sc) {
+  const s = SYSTEMS[id], nc = s.causes.filter(c => !c.ifSym).length, nm = (s.missing || []).length;
+  const causes = plural(nc, 'возможная причина', 'возможные причины', 'возможных причин');
+  const sub = nm ? `${causes} и ${plural(nm, 'анализ', 'анализа', 'анализов')}` : s.retest ? `${causes} и когда пересдать` : causes;
+  if (ctaVariant() === 'd') return `<div class="cta-d"><div><p class="t-l" style="color:#fff">Разобраться в причинах</p><p class="b-m" style="color:#fff;opacity:.85">${sub}</p></div><span class="cta-d-arr">${icon('chev', 18)}</span></div>`;
+  return `<div class="btn btn-sec cta-a"><span>${nm ? 'Причины и что досдать' : 'Причины и когда пересдать'}</span>${icon('chev', 18)}</div>`;
+}
+function themeCard(id, sc) {
+  const s = SYSTEMS[id], past = sc.past && sc.past[id];
+  const rows = s.codes.map(c => indOf(sc, c)).filter(Boolean).map(i => `<div class="th-row"><p class="b-l">${IND[i.code].short || IND[i.code].name}${chip(i)}</p></div>`).join('');
+  const why = past ? past.meaning : sysStatus(sc, id) === 'exp' ? s.expected : SYS_SUMMARY[id].why;
+  return `<button class="card tap th-card" data-sys="${id}"><div class="th-head"><p class="th-t">${s.name}</p><span class="muted">${icon('chev', 18)}</span></div>
+    ${rows}<p class="b-l th-why">${why}</p>${themeCTA(id, sc)}</button>`;
+}
+function themeGroups(sc) {
+  const attn = sc.systems.filter(id => SYS_SUMMARY[id].level === 'attn' && sysStatus(sc, id) !== 'exp');
+  const watch = sc.systems.filter(id => !attn.includes(id));
+  const g = (t, ids) => ids.length ? `<h2 class="t-3xl sec">${t}</h2>${ids.map(id => themeCard(id, sc)).join('')}` : '';
+  return g(sc.old ? 'Тогда требовало внимания' : 'Требует внимания', attn) + g(sc.old ? 'Тогда можно было понаблюдать' : 'Можно понаблюдать', watch);
+}
+// План: всё, что стоит досдать по темам, одним заказом, и один врач
+function planBlock(sc) {
+  const buys = [...new Set(sc.systems.filter(id => sysStatus(sc, id) !== 'exp').flatMap(id => (SYSTEMS[id].missing || []).map(m => m.buy)))];
+  const sum = buys.reduce((a, c) => a + CATALOG[c].price, 0), all = buys.length && buys.every(c => state.picked.has(c));
+  const btn = all ? `<button class="btn on" data-unpick="${buys.join(',')}">${icon('check', 18)} ${plural(buys.length, 'анализ', 'анализа', 'анализов')} в заказе</button>`
+    : `<button class="btn split" data-pick="${buys.join(',')}"><span>Добавить все</span><span class="num">${fmt(sum)} ₽</span></button>`;
+  return `<h2 class="t-3xl sec">Что делать дальше</h2><div class="card">
+    <div class="pl-step"><span class="pl-n">1</span><div><p class="t-l">Досдать ${plural(buys.length, 'анализ', 'анализа', 'анализов')}</p><p class="b-m muted" style="margin-top:2px">${buys.map(c => CATALOG[c].name).join(', ')}</p><div style="margin-top:12px">${btn}</div></div></div>
+    <div class="pl-step"><span class="pl-n">2</span><div><p class="t-l">Показать результаты терапевту</p><p class="b-m muted" style="margin-top:2px">Один врач по всем темам. Лучше прийти уже с досданными анализами</p>
+      <button class="btn btn-sec" style="margin-top:12px" data-stub="doctor">Записаться к терапевту</button>${state.stub.doctor ? '<p class="stub" style="margin-top:8px">Заглушка: переход в Медорию.</p>' : ''}</div></div>
+  </div>`;
 }
 function sysCard(id, sc) {
   const s = SYSTEMS[id], st = sysStatus(sc, id), t = sysText(sc, id);
@@ -1039,10 +1104,11 @@ function vSummary() {
   const hasSys = sc.systems.length > 0;
   return `${appBar('Расшифровка')}
     ${headHTML(sc.old ? 'history' : 'drop', big, line, meta)}
-    <h2 class="t-3xl sec">Общий вывод</h2>
-    <p class="b-xl intro" style="margin-top:0">${infection && sc.summaryInfection ? sc.summaryInfection : sc.summary}</p>${control ? `<div style="margin:0 var(--s-16)">${control}</div>` : ''}
-    ${hasSys ? `<h2 class="t-3xl sec">Что это значит</h2>${sc.systems.map(id => sysCard(id, sc)).join('')}` : ''}
+    ${sc.highlights ? highlightsHTML(sc, infection) : `<h2 class="t-3xl sec">Общий вывод</h2>
+    <p class="b-xl intro" style="margin-top:0">${infection && sc.summaryInfection ? sc.summaryInfection : sc.summary}</p>`}${control ? `<div style="margin:0 var(--s-16)">${control}</div>` : ''}
+    ${hasSys ? themeGroups(sc) : ''}
     ${hasSys && !sc.old ? `<div style="margin-top:var(--s-24)">${qCard(sc)}</div>` : ''}
+    ${hasSys && !sc.old ? planBlock(sc) : ''}
 `;
 }
 
