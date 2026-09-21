@@ -405,8 +405,8 @@ const HERO = {
 function heroIcon(name) {
   return `<svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HERO[name]}</svg>`;
 }
-function headHTML(ic, title, text, meta) {
-  return `<div class="head"><span class="head-ic">${heroIcon(ic)}</span><h1 class="t-6xl" style="font-size:26px;line-height:32px">${title}</h1><p class="b-xl">${text}</p></div>`;
+function headHTML(ic, title, text, meta, note) {
+  return `<div class="head"><span class="head-ic">${heroIcon(ic)}</span><h1 class="t-6xl" style="font-size:26px;line-height:32px">${title}</h1><p class="b-xl">${text}</p>${note ? `<p class="b-l muted" style="margin-top:4px">${note}</p>` : ''}</div>`;
 }
 function icon(name, size = 20) {
   return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
@@ -907,8 +907,8 @@ function vCheck() {
   const qs = !sc.old ? `<div style="margin-top:var(--s-24)">${checkQCard()}</div>` : '';
   return `${appBar('Проверка')}
     ${headHTML('check', isA ? 'Проверьте, что распознали верно' : 'Ваши показатели',
-      isA ? `Нашли ${plural(sc.ind.length, 'показатель', 'показателя', 'показателей')}. Если что-то распознали неточно, нажмите на значение и поправьте.` : 'Пол и возраст взяты из профиля.',
-      `${dateOf()} · ${labOf()} · мужчина, ${plural(sc.person.age, 'год', 'года', 'лет')}`)}
+      `${isA ? 'Нашли ' : ''}${plural(sc.ind.length, 'показатель', 'показателя', 'показателей')}`, '',
+      isA ? 'Если что-то распознали неточно, нажмите на значение и поправьте' : 'Пол и возраст взяты из профиля')}
     ${off.length ? `<h2 class="t-3xl sec">Отклонения (${off.length})</h2><div class="cells ckl">${off.map(cell).join('')}</div>` : ''}
     <h2 class="t-3xl sec">${off.length ? 'В норме' : 'Все в норме'} (${ok.length})</h2><div class="cells ckl">${(state.checkNormOpen ? ok : ok.slice(0, 3)).map(cell).join('')}${ok.length > 3 ? `<div class="ck-more"><button class="btn btn-sec" data-normck aria-expanded="${!!state.checkNormOpen}">${state.checkNormOpen ? 'Скрыть' : 'Показать ещё ' + (ok.length - 3)}</button></div>` : ''}</div>
     ${qs}`;
