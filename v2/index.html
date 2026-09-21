@@ -309,6 +309,21 @@
   .ich .spin { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid var(--brand-bg); border-top-color: var(--brand-base); flex: none; box-sizing: border-box; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .ich .spin { animation-duration: 2.4s; } }
+  /* первый экран */
+  .kick { font: 600 12px/16px var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--brand-base); }
+  .lnd-h1 { font: 700 28px/34px var(--font); margin: 6px 0 12px; }
+  .trust { display: flex; gap: 6px; flex-wrap: wrap; }
+  .trust span { display: inline-flex; gap: 4px; align-items: center; font: 500 12px/16px var(--font); color: var(--text-a56); background: #fff; border-radius: 999px; padding: 5px 9px; }
+  .trust svg { color: var(--brand-base); }
+  .lnd-ill { position: relative; height: 236px; margin: 22px var(--s-16) 0; max-width: 360px; }
+  .lnd-sheet { position: absolute; left: 6px; top: 20px; width: 130px; height: 176px; border-radius: 14px; background: #fff; transform: rotate(-6deg); box-shadow: 0 6px 20px #30393A14; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .lnd-sheet span { height: 5px; border-radius: 3px; background: var(--mono-150); }
+  .lnd-card { position: absolute; right: 4px; top: 38px; width: 222px; border-radius: 16px; background: #fff; box-shadow: 0 10px 30px #30393A1F; padding: 6px 12px; }
+  .lnd-row { display: flex; justify-content: space-between; align-items: center; height: 32px; }
+  .lnd-row .chip { margin-left: 0; }
+  .lnd-ln { display: flex; gap: 6px; align-items: center; height: 26px; border-top: 1px solid var(--stroke-a4); }
+  .lnd-ln > span:first-child { color: var(--brand-base); display: grid; }
+  .bar .fine { font-size: 11px; line-height: 14px; color: var(--text-a56); text-align: center; margin-top: 2px; }
   /* вход — копия формы сайта lab4u.ru */
   .au { position: fixed; inset: 0; z-index: 30; overflow: auto; font-family: Roboto, Arial, sans-serif; color: #2B2F38; background: #fff; display: flex; flex-direction: column; padding: 12px 16px calc(12px + 34px); max-width: 640px; margin: 0 auto; }
   .au .top { position: relative; height: 52px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
@@ -344,6 +359,9 @@ const ICONS = {
   back: '<path d="M15 5l-7 7 7 7"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  gift: '<path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13"/><path d="M12 7c-2-3-5-3-5-1s3 1 5 1c2 0 5 1 5-1s-3-2-5 1"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  flask: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/>',
   image: '<rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M20 16l-5-5-8 8"/>',
   more: '<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>',
   chev: '<path d="M9 5l7 7-7 7"/>',
@@ -769,14 +787,22 @@ function panelCTA(panelId, sc) {
 
 /* ============================ ЭКРАНЫ ============================ */
 function vStart() {
+  const tr = (ic, t) => `<span>${icon(ic, 14)}${t}</span>`;
+  const ln = t => `<div class="lnd-ln"><span>${icon('check', 16)}</span><span class="b-m">${t}</span></div>`;
+  const sheet = [60, 95, 80, 90, 55, 85, 70, 92, 65].map(w => `<span style="width:${w}%"></span>`).join('');
   return `${appBar('Lab4U', false).replace(icon('more'), icon('menu'))}
-    ${headHTML('scan', 'Расшифровка анализов', 'Бесплатно · около 5 минут')}
-    <h2 class="t-3xl sec">Как это работает</h2>
-    <div class="cells">
-      ${[['Загрузите бланк', 'Любой лаборатории, фото или PDF. Или выберите сдачу в Lab4U'], ['Проверьте значения', 'Покажем, что прочитали, неточное можно поправить'], ['Получите разбор', 'Что значит, почему могло быть так и что делать']]
-        .map(([t, d], k) => `<div class="cell" style="grid-template-columns:32px 1fr"><span class="ring sm" style="background:var(--brand-bg)"><i style="background:transparent;color:var(--brand-base)">${k + 1}</i></span><div><p class="t-l">${t}</p><p class="b-m muted">${d}</p></div></div>`).join('')}
+    <div style="padding:4px var(--s-16) 0">
+      <p class="kick">Расшифровка анализов</p>
+      <h1 class="lnd-h1">Поймите, что показывают ваши анализы</h1>
+      <div class="trust">${tr('gift', 'Бесплатно')}${tr('clock', 'Около 5 минут')}${tr('flask', 'Любая лаборатория')}</div>
     </div>
-    <p class="b-m muted" style="margin:var(--s-16) var(--s-16) 0">Разбор носит рекомендательный характер и не заменяет консультацию врача. Для взрослых старше 18 лет.</p>`;
+    <div class="lnd-ill" aria-hidden="true">
+      <div class="lnd-sheet">${sheet}</div>
+      <div class="lnd-card">
+        <div class="lnd-row"><span class="t-l">Ферритин</span><span class="chip off">низкий</span></div>
+        ${ln('С чем это связано')}${ln('Какие риски и как их снизить')}${ln('Что досдать, к кому идти')}
+      </div>
+    </div>`;
 }
 function sheetUpload() {
   const src = (ic, t) => `<button class="card" data-files style="margin:0;padding:14px 6px;display:grid;justify-items:center;gap:6px;background:var(--bg-base)"><span class="ic brand">${icon(ic)}</span><span class="t-l">${t}</span></button>`;
@@ -1078,7 +1104,7 @@ function vDetail(id) {
 
 /* ============================ НИЖНЯЯ ПАНЕЛЬ И ШТОРКИ ============================ */
 function bottomBar() {
-  if (state.screen === 'start') return `<div class="bar"><button class="btn" data-upload>Загрузить бланк</button><button class="btn btn-sec" data-mine>Мои анализы в Lab4U</button></div>`;
+  if (state.screen === 'start') return `<div class="bar"><button class="btn" data-upload>Загрузить бланк</button><button class="btn btn-sec" data-mine>Мои анализы в Lab4U</button><p class="fine">Не заменяет консультацию врача · для взрослых 18+</p></div>`;
   if (state.screen === 'check') {
     return `<div class="bar"><button class="btn" data-confirm>Всё верно, получить разбор</button></div>`;
   }
