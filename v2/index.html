@@ -249,6 +249,7 @@
   .veil { position: fixed; inset: 0; background: var(--overlay); z-index: 20; }
   .veil { position: absolute !important; left: 0; right: 0; bottom: auto !important; height: 100lvh; opacity: 0; }
   .page { background: var(--bg-base); min-height: 100lvh; }
+  body.noscroll .appbar { position: relative; background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .sheet.in, .fp.in { animation: sheetIn .38s cubic-bezier(.32, .72, 0, 1); }
   @keyframes sheetIn { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
   .sheet .handle { cursor: grab; touch-action: none; }
@@ -1173,7 +1174,8 @@ function dimTo(k) {
   dimK = Math.max(0, Math.min(1, k));
   const v = document.querySelector('#sheet .veil'); if (v) v.style.opacity = dimK;
   const a = 0.32 * dimK, c = [241, 242, 244].map(x => Math.round(x * (1 - a) + 3 * a));
-  document.body.style.backgroundColor = dimK ? `rgb(${c.join(',')})` : '';
+  const col = dimK ? `rgb(${c.join(',')})` : '';
+  document.body.style.backgroundColor = col; document.documentElement.style.backgroundColor = col;
 }
 function fadeVeil(from, to, ms) {
   cancelAnimationFrame(veilAnim); const t0 = performance.now();
