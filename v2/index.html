@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="theme-color" content="#F1F2F4">
 <title>Мобильный Lab4 Insight v2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -249,7 +250,7 @@
   .veil.in { animation: veilIn .3s ease-out; }
   .sheet.in, .fp.in { animation: sheetIn .38s cubic-bezier(.32, .72, 0, 1); }
   @keyframes sheetIn { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
-  @keyframes veilIn { from { background-color: rgba(3, 2, 4, 0); } to { background-color: rgba(3, 2, 4, .32); } }
+  @keyframes veilIn { from { opacity: 0; } to { opacity: 1; } }
   .sheet .handle { cursor: grab; touch-action: none; }
   @media (prefers-reduced-motion: reduce) { .sheet.in, .fp.in, .veil.in { animation-duration: .01s; } }
   .sheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: min(640px, 100%); max-height: 90vh; overflow-y: auto; z-index: 21; background: var(--modals-base); border-radius: var(--r-24) var(--r-24) 0 0; box-shadow: var(--shadow-600); padding: 0 var(--s-16) calc(var(--s-16) + env(safe-area-inset-bottom)); }
@@ -332,7 +333,10 @@
   .lnd-ln > span:first-child { color: var(--brand-base); display: grid; }
   .bar .fine { font-size: 11px; line-height: 14px; color: var(--text-a56); text-align: center; margin-top: 2px; }
   /* вход — копия формы сайта lab4u.ru */
-  .au { position: fixed; inset: 0; z-index: 30; overflow: auto; font-family: Roboto, Arial, sans-serif; color: #2B2F38; background: #fff; display: flex; flex-direction: column; padding: 12px 16px calc(12px + 34px); max-width: 640px; margin: 0 auto; }
+  .au { font-family: Roboto, Arial, sans-serif; color: #2B2F38; display: flex; flex-direction: column; }
+  .sheet-au { max-height: 92vh; }
+  .au .top { height: 40px !important; }
+  .au .x { top: 9px !important; }
   .au .top { position: relative; height: 52px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
   .au .x { position: absolute; right: 0; top: 14px; }
   .au .in { display: flex; align-items: center; height: 48px; border: 1px solid #DDE0E6; border-radius: 8px; padding: 0 12px; font-size: 15px; color: #6E7686; margin-top: 8px; }
@@ -840,14 +844,14 @@ function sheetLogin() {
   const SB = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M20 7.5A9 9 0 1 1 17 4.5"/><path d="M7.5 11.5l3.5 3.5L21 5"/></svg>';
   const app = `<div class="app4u"><span class="logo">L4U</span><div><b>Скачать мобильное приложение</b><small>iOS и Android</small></div><span style="margin-left:auto;color:#6E7686">${icon('chev', 16)}</span></div>`;
   const tail = `<div class="or">или</div><button class="b tb" data-login>Т-Банк <span class="tid">T ID</span></button><button class="b sber" data-login>${SB} Сбер ID</button>`;
-  if (state.reg) return `<div class="au" role="dialog" aria-label="Регистрация"><div class="top">Регистрация<button data-close aria-label="Закрыть">${X}</button></div>
+  if (state.reg) return `<div class="veil" data-close></div><div class="sheet sheet-au" role="dialog" aria-label="Регистрация"><div class="handle"><i></i></div><div class="au"><div class="top">Регистрация<button data-close aria-label="Закрыть">${X}</button></div>
     <div class="in">Электронная почта</div><div class="in">Мобильный телефон</div><div class="in">Придумайте пароль${EYE}</div>${app}
     <div class="cbx"><i></i><span>Я даю свое согласие на сбор и обработку моих персональных данных в соответствии с <u>Политикой</u> и принимаю условия <u>Пользовательского соглашения</u></span></div>
-    <div class="sp"></div><button class="b b1" data-login>Зарегистрироваться</button><button class="b b2" data-reg>Я уже зарегистрирован</button>${tail}</div>`;
-  return `<div class="au" role="dialog" aria-label="Вход"><div class="top">Вход<button data-close aria-label="Закрыть">${X}</button></div>
+    <div class="sp"></div><button class="b b1" data-login>Зарегистрироваться</button><button class="b b2" data-reg>Я уже зарегистрирован</button>${tail}</div></div>`;
+  return `<div class="veil" data-close></div><div class="sheet sheet-au" role="dialog" aria-label="Вход"><div class="handle"><i></i></div><div class="au"><div class="top">Вход<button data-close aria-label="Закрыть">${X}</button></div>
     <div class="in">Электронная почта</div><div class="in">Пароль${EYE}</div>${app}
     <div class="sp"></div><div class="forgot">Забыли пароль?</div>
-    <button class="b b1" data-login>Войти</button><button class="b b2" data-reg>Новый пользователь</button>${tail}</div>`;
+    <button class="b b1" data-login>Войти</button><button class="b b2" data-reg>Новый пользователь</button>${tail}</div></div>`;
 }
 
 function vUpload() {
@@ -1158,6 +1162,10 @@ function render() {
   }
   lastSheet = state.sheet;
   document.body.classList.toggle('noscroll', !!state.sheet);
+  // Safari красит полосу статуса по фону страницы: пока открыта шторка, фон того же тона, что под затемнением
+  const dim = !!document.querySelector('#sheet .veil');
+  document.documentElement.style.backgroundColor = dim ? '#A5A5A7' : '';
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dim ? '#A5A5A7' : '#F1F2F4');
   if (state.screen === 'upload' && !state.uploadTimer) startUpload();
 }
 let lastSheet = null;
@@ -1167,7 +1175,6 @@ function closeSheet() {
   const done = () => { state.sheet = null; render(); };
   if (!el) return done();
   el.style.transition = 'transform .26s cubic-bezier(.4, 0, 1, 1)'; el.style.transform = 'translate(-50%, 100%)';
-  if (veil) { veil.style.transition = 'background-color .26s'; veil.style.backgroundColor = 'rgba(3, 2, 4, 0)'; }
   setTimeout(done, 260);
 }
 // Свайп вниз: тянем за ручку или за шторку, когда она прокручена к началу
@@ -1183,7 +1190,6 @@ function closeSheet() {
     if (dy > 4) moved = true; if (!moved) return;
     if (e.cancelable) e.preventDefault();
     el.style.transition = 'none'; el.style.transform = `translate(-50%, ${dy}px)`;
-    if (veil) { veil.style.transition = 'none'; veil.style.backgroundColor = `rgba(3, 2, 4, ${(0.32 * Math.max(0, 1 - dy / el.offsetHeight)).toFixed(3)})`; }
   };
   const end = () => {
     if (!el) return; const s = el; el = null;
@@ -1191,7 +1197,6 @@ function closeSheet() {
     const v = dy / Math.max(1, Date.now() - t0);
     if (dy > s.offsetHeight * 0.3 || v > 0.6) return closeSheet();
     s.style.transition = 'transform .3s cubic-bezier(.32, .72, 0, 1)'; s.style.transform = '';
-    if (veil) { veil.style.transition = 'background-color .3s'; veil.style.backgroundColor = ''; }
     // не считать отпускание кликом по кнопке
     const stop = ev => { ev.stopPropagation(); ev.preventDefault(); }; document.addEventListener('click', stop, { capture: true, once: true }); setTimeout(() => document.removeEventListener('click', stop, { capture: true }), 50);
   };
