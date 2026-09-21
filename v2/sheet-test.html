@@ -80,6 +80,8 @@ if (f) {
   if (f === 'bg' || f === 'bgtint') v.style.background = 'rgba(3, 2, 4, .16)';
   if (f === 'bgtint') tint(.16);
   if (f === 'none') v.style.opacity = 0;
+  if (f === 'slowjs') { const t0 = performance.now(); const st = now => { const k = Math.min(1, (now - t0) / 10000); v.style.background = `rgba(3, 2, 4, ${(.32 * k).toFixed(3)})`; if (k < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }
+  if (f === 'slowcss') { v.style.background = 'rgba(3, 2, 4, 0)'; v.style.transition = 'background-color 10s linear'; requestAnimationFrame(() => requestAnimationFrame(() => v.style.background = 'rgba(3, 2, 4, .32)')); }
 }
 // свайп вниз
 let y0 = null, dy = 0, t0 = 0;
