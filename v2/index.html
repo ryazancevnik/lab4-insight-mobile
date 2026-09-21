@@ -249,9 +249,8 @@
   .veil { position: fixed; inset: 0; background: var(--overlay); z-index: 20; }
   .veil { position: absolute !important; left: 0; right: 0; bottom: auto !important; height: 100lvh; opacity: 0; }
   .page { background: var(--bg-base); min-height: 100lvh; }
-  /* фон шапки отдельным слоем: сама шапка без фона, чтобы Safari брал цвет полосы статуса у body */
-  .appbar { background: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; isolation: isolate; }
-  .appbar::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #F1F2F4E6; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
+  .app { position: relative; }
+  .appbar.frozen { position: absolute; left: 0; right: 0; margin: 0; }
   .sheet.in, .fp.in { animation: sheetIn .38s cubic-bezier(.32, .72, 0, 1); }
   @keyframes sheetIn { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
   .sheet .handle { cursor: grab; touch-action: none; }
@@ -1167,6 +1166,9 @@ function render() {
   else if (!state.sheet) dimTo(0);
   lastSheet = state.sheet;
   document.body.classList.toggle('noscroll', !!state.sheet);
+  const ab = document.querySelector('#app .appbar'), appEl = document.getElementById('app');
+  if (ab && state.sheet) { ab.classList.add('frozen'); ab.style.top = Math.max(0, scrollY - appEl.offsetTop) + 'px'; appEl.style.paddingTop = ab.offsetHeight + 'px'; }
+  else appEl.style.paddingTop = '';
   if (state.screen === 'upload' && !state.uploadTimer) startUpload();
 }
 let lastSheet = null, dimK = 0, veilAnim = 0;
