@@ -246,6 +246,12 @@
 
   /* шторка: bottomSheet */
   .veil { position: fixed; inset: 0; background: var(--overlay); z-index: 20; }
+  .veil.in { animation: veilIn .3s ease-out; }
+  .sheet.in, .fp.in { animation: sheetIn .38s cubic-bezier(.32, .72, 0, 1); }
+  @keyframes sheetIn { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
+  @keyframes veilIn { from { opacity: 0; } to { opacity: 1; } }
+  .sheet .handle { cursor: grab; touch-action: none; }
+  @media (prefers-reduced-motion: reduce) { .sheet.in, .fp.in, .veil.in { animation-duration: .01s; } }
   .sheet { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: min(640px, 100%); max-height: 90vh; overflow-y: auto; z-index: 21; background: var(--modals-base); border-radius: var(--r-24) var(--r-24) 0 0; box-shadow: var(--shadow-600); padding: 0 var(--s-16) calc(var(--s-16) + env(safe-area-inset-bottom)); }
   .sheet .handle { display: flex; justify-content: center; padding: 9px 0; }
   .sheet .handle i { width: 41px; height: 6px; border-radius: var(--r-8); background: var(--text-a32); }
@@ -1146,9 +1152,56 @@ function render() {
   document.getElementById('bar').innerHTML = bottomBar();
   const sheets = { upload: sheetUpload, files: sheetFiles, login: sheetLogin, cart: sheetCart };
   document.getElementById('sheet').innerHTML = sheets[state.sheet] ? sheets[state.sheet]() : '';
+  if (state.sheet && state.sheet !== lastSheet) {
+    document.querySelector('#sheet .sheet, #sheet .fp')?.classList.add('in');
+    if (!lastSheet) document.querySelector('#sheet .veil')?.classList.add('in');
+  }
+  lastSheet = state.sheet;
   document.body.classList.toggle('noscroll', !!state.sheet);
   if (state.screen === 'upload' && !state.uploadTimer) startUpload();
 }
+let lastSheet = null;
+// Закрыть шторку: уезжает вниз, фон гаснет
+function closeSheet() {
+  const el = document.querySelector('#sheet .sheet, #sheet .fp'), veil = document.querySelector('#sheet .veil');
+  const done = () => { state.sheet = null; render(); };
+  if (!el) return done();
+  el.style.transition = 'transform .26s cubic-bezier(.4, 0, 1, 1)'; el.style.transform = 'translate(-50%, 100%)';
+  if (veil) { veil.style.transition = 'opacity .26s'; veil.style.opacity = '0'; }
+  setTimeout(done, 260);
+}
+// Свайп вниз: тянем за ручку или за шторку, когда она прокручена к началу
+(function () {
+  let el = null, veil = null, y0 = 0, dy = 0, t0 = 0, moved = false;
+  const start = (e, y) => {
+    const s = e.target.closest('#sheet .sheet, #sheet .fp'); if (!s) return;
+    if (!e.target.closest('.handle') && s.scrollTop > 0) return;
+    el = s; veil = document.querySelector('#sheet .veil'); y0 = y; dy = 0; t0 = Date.now(); moved = false;
+  };
+  const move = (e, y) => {
+    if (!el) return; dy = Math.max(0, y - y0);
+    if (dy > 4) moved = true; if (!moved) return;
+    if (e.cancelable) e.preventDefault();
+    el.style.transition = 'none'; el.style.transform = `translate(-50%, ${dy}px)`;
+    if (veil) veil.style.opacity = String(Math.max(0, 1 - dy / el.offsetHeight));
+  };
+  const end = () => {
+    if (!el) return; const s = el; el = null;
+    if (!moved) return;
+    const v = dy / Math.max(1, Date.now() - t0);
+    if (dy > s.offsetHeight * 0.3 || v > 0.6) return closeSheet();
+    s.style.transition = 'transform .3s cubic-bezier(.32, .72, 0, 1)'; s.style.transform = '';
+    if (veil) { veil.style.transition = 'opacity .3s'; veil.style.opacity = ''; }
+    // не считать отпускание кликом по кнопке
+    const stop = ev => { ev.stopPropagation(); ev.preventDefault(); }; document.addEventListener('click', stop, { capture: true, once: true }); setTimeout(() => document.removeEventListener('click', stop, { capture: true }), 50);
+  };
+  document.addEventListener('touchstart', e => start(e, e.touches[0].clientY), { passive: true });
+  document.addEventListener('touchmove', e => move(e, e.touches[0].clientY), { passive: false });
+  document.addEventListener('touchend', end); document.addEventListener('touchcancel', end);
+  document.addEventListener('mousedown', e => start(e, e.clientY));
+  document.addEventListener('mousemove', e => { if (el) move(e, e.clientY); });
+  document.addEventListener('mouseup', end);
+})();
 function go(screen, restore = false) { state.screen = screen; state.sheet = null; render(); window.scrollTo(0, restore ? state.summaryY : 0); }
 let uploadRun = 0;
 function startUpload() {
@@ -1208,7 +1261,7 @@ document.addEventListener('click', e => {
   if (d.stub) { state.stub[d.stub] = !state.stub[d.stub]; return render(); }
   if (d.pickall) { d.pickall.split(',').forEach(c => state.picked.add(c)); return render(); }
   if (d.sheet) { state.sheet = d.sheet; return render(); }
-  if ('close' in d) { state.sheet = null; return render(); }
+  if ('close' in d) return closeSheet();
   if ('confirm' in d) { if (ent() === 'A' && !state.loggedIn) { state.after = 'summary'; state.reg = false; state.sheet = 'login'; return render(); } return go('summary'); }
   if ('register' in d) { return go('summary'); }
   if (d.anchor) { go('summary'); const el = document.getElementById(d.anchor); if (el) el.scrollIntoView({ block: 'start' }); window.scrollBy(0, -64); }
