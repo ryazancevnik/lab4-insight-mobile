@@ -1295,4 +1295,10 @@ document.addEventListener('change', e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.sheet) { state.sheet = null; render(); } });
 window.addEventListener('DOMContentLoaded', render);
+if (location.search.includes('debug')) {
+  const dbg = document.createElement('div'); dbg.style.cssText = 'position:fixed;left:8px;top:60px;z-index:99;background:#000c;color:#0f0;font:11px monospace;padding:4px 6px;border-radius:6px;max-width:90vw;pointer-events:none';
+  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(dbg));
+  const errs = []; window.addEventListener('error', e => errs.push(e.message + ' @' + e.lineno));
+  setInterval(() => { const v = document.querySelector('#sheet .veil'); dbg.textContent = `k=${dimK.toFixed(2)} veil=${v ? v.style.opacity + '/' + getComputedStyle(v).opacity : '-'} body=${document.body.style.backgroundColor} ${errs.join(' | ')}`; }, 200);
+}
 </script>
