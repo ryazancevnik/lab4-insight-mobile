@@ -851,9 +851,9 @@ function sheetLogin() {
   const app = `<div class="app4u"><span class="logo">L4U</span><div><b>Скачать мобильное приложение</b><small>iOS и Android</small></div><span style="margin-left:auto;color:#6E7686">${icon('chev', 16)}</span></div>`;
   const tail = `<div class="or">или</div><button class="b tb" data-login>Т-Банк <span class="tid">T ID</span></button><button class="b sber" data-login>${SB} Сбер ID</button>`;
   if (state.reg) return `<div class="veil" data-close></div><div class="sheet sheet-au" role="dialog" aria-label="Регистрация"><div class="handle"><i></i></div><div class="au"><div class="top">Регистрация<button data-close aria-label="Закрыть">${X}</button></div>
-    <div class="in">Электронная почта</div><div class="in">Мобильный телефон</div><div class="in">Придумайте пароль${EYE}</div>${app}
-    <div class="cbx"><i></i><span>Я даю свое согласие на сбор и обработку моих персональных данных в соответствии с <u>Политикой</u> и принимаю условия <u>Пользовательского соглашения</u></span></div>
-    <div class="sp"></div><button class="b b1" data-login>Зарегистрироваться</button><button class="b b2" data-reg>Я уже зарегистрирован</button>${tail}</div></div>`;
+    <div class="in f"><span><small>Электронная почта</small>demo@example.com</span></div><div class="in f"><span><small>Мобильный телефон</small>+7 900 000-00-00</span></div><div class="in f"><span><small>Придумайте пароль</small>••••••••</span>${EYE}</div>${app}
+    <div class="cbx"><i class="on">✓</i><span>Я даю свое согласие на сбор и обработку моих персональных данных в соответствии с <u>Политикой</u> и принимаю условия <u>Пользовательского соглашения</u></span></div>
+    <div class="sp"></div><button class="b b1 on" data-login>Зарегистрироваться</button><button class="b b2" data-reg>Я уже зарегистрирован</button>${tail}</div></div>`;
   return `<div class="veil" data-close></div><div class="sheet sheet-au" role="dialog" aria-label="Вход"><div class="handle"><i></i></div><div class="au"><div class="top">Вход<button data-close aria-label="Закрыть">${X}</button></div>
     <div class="in f"><span><small>Электронная почта</small>demo@example.com</span></div><div class="in f"><span><small>Пароль</small>••••••••</span>${EYE}</div>${app}
     <div class="sp"></div><div class="forgot">Забыли пароль?</div>
