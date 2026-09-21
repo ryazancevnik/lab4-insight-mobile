@@ -326,7 +326,7 @@
   .gen { color: #fff; min-height: 100lvh; display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top)) 0 calc(40px + env(safe-area-inset-bottom)); box-sizing: border-box; }
   .gen .cap { font: 600 12px/16px var(--font); letter-spacing: .06em; text-transform: uppercase; opacity: .8; }
   .gen .gmid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-top: 24px; }
-  .gen .gslider { overflow: hidden; margin-left: calc(-1 * var(--s-16)); margin-right: calc(-1 * var(--s-16)); }
+  .gen .gslider { touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; overflow: hidden; margin-left: calc(-1 * var(--s-16)); margin-right: calc(-1 * var(--s-16)); }
   .gen .gtrack { display: flex; transition: transform .55s cubic-bezier(.32, .72, 0, 1); }
   .gen .fact-i { flex: 0 0 100%; box-sizing: border-box; padding: 0 20px; text-align: center; }
   .gen .num { font: 800 52px/60px var(--font); letter-spacing: -.02em; margin-top: 22px; white-space: nowrap; }
@@ -893,7 +893,7 @@ const GEN_FACTS = [
   ['54%', 'людей с диабетом 2 типа в России не знали о нём, пока не сдали анализ. Проверка сахара раз в год помогает заметить изменения вовремя'],
   ['1 из 4', 'взрослых думает, что о холестерине можно не беспокоиться, пока нет симптомов. А чтобы увидеть полную картину, одного общего холестерина мало: нужен липидный профиль из 4 показателей'],
   ['18 276', 'пациентов Lab4U следят за динамикой показателей в личном кабинете'],
-  ['до 50%', 'скидка на анализы в Lab4U: вы оформляете и оплачиваете заказ онлайн, а анализаторы работают автоматически'],
+  ['до 50%', 'скидка на анализы в Lab4U — выбираете анализы, записываетесь на сдачу в ближайшем пункте в удобное время и оплачиваете онлайн со скидкой'],
 ];
 const GEN_STEPS = ['Сверяем показатели с нормами', 'Ищем связи между отклонениями', 'Подбираем, что стоит досдать', 'Собираем рекомендации'];
 const GEN_FACT_MS = 4000, GEN_MS = GEN_FACT_MS * GEN_FACTS.length;
@@ -905,7 +905,7 @@ function genSteps(p) {
 }
 function vGen() {
   const el = state.genStart ? performance.now() - state.genStart : 0, p = Math.min(1, el / GEN_MS);
-  const fi = Math.min(GEN_FACTS.length - 1, Math.floor(el / GEN_FACT_MS));
+  const fi = state.genStart ? state.genSlide || 0 : 0;
   return `<div class="gen" style="--gen-ms:${GEN_MS}ms">
     <div class="card-g" role="progressbar" aria-label="Готовим расшифровку">
       <div style="display:flex;justify-content:space-between;align-items:baseline"><p style="font:700 17px/22px var(--font)">Готовим расшифровку</p><p style="font:600 15px/20px var(--font)" id="genPct">${Math.round(p * 100)}%</p></div>
@@ -917,23 +917,55 @@ function vGen() {
     </div></div>
     <div class="dots" id="genDots">${genDots(fi)}</div></div></div>`;
 }
-// Ход генерации: процент и этапы обновляются часто, факт — раз в 4 секунды с плавной сменой; в конце — сводка
+// Ход генерации: процент и этапы идут по времени; слайды листаются сами каждые 4 с и пальцем,
+// после ручного перелистывания автолистание продолжается через те же 4 с; в конце — сводка
 let genRun = 0;
+function genSetSlide(i, animate = true) {
+  state.genSlide = i; state.genFlip = performance.now();
+  const tr = document.getElementById('genTrack'); if (!tr) return;
+  tr.style.transition = animate ? '' : 'none'; tr.style.transform = `translateX(-${i * 100}%)`;
+  document.getElementById('genDots').innerHTML = genDots(i);
+}
 function startGen() {
-  state.genStart = performance.now(); const run = ++genRun; let shown = 0, shownStep = 0;
+  state.genStart = performance.now(); state.genSlide = 0; state.genFlip = state.genStart; const run = ++genRun; let shownStep = 0;
   const tick = () => {
     if (state.screen !== 'gen' || run !== genRun) return;
-    const el = performance.now() - state.genStart, p = Math.min(1, el / GEN_MS);
+    const now = performance.now(), p = Math.min(1, (now - state.genStart) / GEN_MS);
     const pct = document.getElementById('genPct'); if (pct) pct.textContent = Math.round(p * 100) + '%';
     const cur = Math.min(GEN_STEPS.length - 1, Math.floor(p * GEN_STEPS.length)), st = document.getElementById('genSteps');
     if (st && cur !== shownStep) { shownStep = cur; st.innerHTML = genSteps(p); }
-    const i = Math.min(GEN_FACTS.length - 1, Math.floor(el / GEN_FACT_MS)), tr = document.getElementById('genTrack');
-    if (tr && i !== shown) { shown = i; tr.style.transition = ''; tr.style.transform = `translateX(-${i * 100}%)`; document.getElementById('genDots').innerHTML = genDots(i); }
+    if (!genDrag && now - state.genFlip >= GEN_FACT_MS) genSetSlide((state.genSlide + 1) % GEN_FACTS.length);
     if (p >= 1) return setTimeout(() => { if (state.screen === 'gen' && run === genRun) go('summary'); }, 400);
     setTimeout(tick, 250);
   };
   setTimeout(tick, 250);
 }
+// Свайп слайдера по горизонтали
+let genDrag = null;
+(function () {
+  const start = (e, x, y) => { if (!e.target.closest('#genTrack')) return; genDrag = { x, y, dx: 0, h: null }; };
+  const move = (e, x, y) => {
+    if (!genDrag) return; const dx = x - genDrag.x, dy = y - genDrag.y;
+    if (genDrag.h === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) genDrag.h = Math.abs(dx) > Math.abs(dy);
+    if (!genDrag.h) return; if (e.cancelable) e.preventDefault();
+    const n = GEN_FACTS.length, i = state.genSlide;
+    genDrag.dx = (i === 0 && dx > 0) || (i === n - 1 && dx < 0) ? dx / 3 : dx;   // у краёв тянется туже
+    const tr = document.getElementById('genTrack'); tr.style.transition = 'none';
+    tr.style.transform = `translateX(calc(-${i * 100}% + ${genDrag.dx}px))`;
+  };
+  const end = () => {
+    if (!genDrag) return; const d = genDrag; genDrag = null; if (!d.h) return;
+    const n = GEN_FACTS.length; let i = state.genSlide;
+    if (d.dx < -50 && i < n - 1) i++; else if (d.dx > 50 && i > 0) i--;
+    genSetSlide(i);
+  };
+  document.addEventListener('touchstart', e => start(e, e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  document.addEventListener('touchmove', e => move(e, e.touches[0].clientX, e.touches[0].clientY), { passive: false });
+  document.addEventListener('touchend', end); document.addEventListener('touchcancel', end);
+  document.addEventListener('mousedown', e => start(e, e.clientX, e.clientY));
+  document.addEventListener('mousemove', e => { if (genDrag) move(e, e.clientX, e.clientY); });
+  document.addEventListener('mouseup', end);
+})();
 function vUpload() {
   const sc = S(), f = sc.file || { name: 'Бланк.pdf', size: '', kind: 'pdf' }, done = state.stagesDone;
   const st = [['Файл получен, читаем бланк', true], [`Нашли ${plural(sc.ind.length, 'показатель', 'показателя', 'показателей')}`, done >= 2], ['Сверяем с нормами лаборатории', done >= 3]];
