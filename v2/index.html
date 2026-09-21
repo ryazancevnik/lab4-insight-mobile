@@ -323,15 +323,17 @@
   @keyframes upfill { from { transform: scaleX(.04); } to { transform: scaleX(1); } }
   /* экран генерации разбора */
   body.gen-mode, body.gen-mode .page { background: var(--brand-base); }
-  .gen { color: #fff; min-height: 100lvh; position: relative; padding: 0 4px; }
+  .gen { color: #fff; min-height: 100lvh; display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top)) 0 calc(40px + env(safe-area-inset-bottom)); box-sizing: border-box; }
   .gen .cap { font: 600 12px/16px var(--font); letter-spacing: .06em; text-transform: uppercase; opacity: .8; }
-  .gen .fact-i { text-align: center; padding-top: 56px; transition: opacity .35s; }
+  .gen .gslider { margin-top: auto; overflow: hidden; margin-left: calc(-1 * var(--s-16)); margin-right: calc(-1 * var(--s-16)); }
+  .gen .gtrack { display: flex; transition: transform .55s cubic-bezier(.32, .72, 0, 1); }
+  .gen .fact-i { flex: 0 0 100%; box-sizing: border-box; padding: 0 20px; text-align: center; }
   .gen .num { font: 800 52px/60px var(--font); letter-spacing: -.02em; margin-top: 22px; white-space: nowrap; }
   .gen .txt { font: 500 19px/26px var(--font); margin-top: 14px; }
   .gen .dots { display: flex; gap: 6px; justify-content: center; margin-top: 24px; }
   .gen .dots i { width: 6px; height: 6px; border-radius: 3px; background: #FFFFFF59; transition: width .3s, background .3s; }
   .gen .dots i.on { width: 18px; background: #fff; }
-  .gen .card-g { position: fixed; left: 50%; transform: translateX(-50%); width: calc(min(640px, 100%) - 32px); bottom: calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF1F; border-radius: 20px; padding: 18px; }
+  .gen .card-g { background: #FFFFFF1F; border-radius: 20px; padding: 18px; }
   .gen .pbar { height: 6px; border-radius: 3px; background: #FFFFFF40; overflow: hidden; margin: 10px 0 8px; }
   .gen .pbar b { display: block; height: 100%; width: 100%; background: #fff; border-radius: 3px; transform-origin: left; animation: genfill var(--gen-ms) linear forwards; }
   @keyframes genfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -894,11 +896,7 @@ const GEN_FACTS = [
 ];
 const GEN_STEPS = ['Сверяем показатели с нормами', 'Ищем связи между отклонениями', 'Подбираем, что стоит досдать', 'Собираем разбор'];
 const GEN_FACT_MS = 4000, GEN_MS = GEN_FACT_MS * GEN_FACTS.length;
-function genFact(i) {
-  const [num, txt] = GEN_FACTS[i];
-  return `<p class="cap">Факт ${i + 1} из ${GEN_FACTS.length}</p><p class="num">${num}</p><p class="txt">${txt}</p>
-    <div class="dots">${GEN_FACTS.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>`;
-}
+function genDots(i) { return GEN_FACTS.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join(''); }
 function genSteps(p) {
   const cur = Math.min(GEN_STEPS.length - 1, Math.floor(p * GEN_STEPS.length));
   return GEN_STEPS.map((t, k) => { const st = k < cur ? 'ok' : k === cur ? 'sp' : 'em';
@@ -906,13 +904,17 @@ function genSteps(p) {
 }
 function vGen() {
   const el = state.genStart ? performance.now() - state.genStart : 0, p = Math.min(1, el / GEN_MS);
+  const fi = Math.min(GEN_FACTS.length - 1, Math.floor(el / GEN_FACT_MS));
   return `<div class="gen" style="--gen-ms:${GEN_MS}ms">
-    <div class="fact-i" id="genFact">${genFact(Math.min(GEN_FACTS.length - 1, Math.floor(el / GEN_FACT_MS)))}</div>
     <div class="card-g" role="progressbar" aria-label="Готовим разбор">
       <div style="display:flex;justify-content:space-between;align-items:baseline"><p style="font:700 17px/22px var(--font)">Готовим разбор</p><p style="font:600 15px/20px var(--font)" id="genPct">${Math.round(p * 100)}%</p></div>
       <div class="pbar"><b style="animation-delay:-${Math.round(el)}ms"></b></div>
       <div id="genSteps">${genSteps(p)}</div>
-    </div></div>`;
+    </div>
+    <div class="gslider" aria-live="polite"><div class="gtrack" id="genTrack" style="transform:translateX(-${fi * 100}%);transition:none">
+      ${GEN_FACTS.map(([num, txt], k) => `<div class="fact-i"><p class="cap">Факт ${k + 1} из ${GEN_FACTS.length}</p><p class="num">${num}</p><p class="txt">${txt}</p></div>`).join('')}
+    </div></div>
+    <div class="dots" id="genDots">${genDots(fi)}</div></div>`;
 }
 // Ход генерации: процент и этапы обновляются часто, факт — раз в 4 секунды с плавной сменой; в конце — сводка
 let genRun = 0;
@@ -923,8 +925,8 @@ function startGen() {
     const el = performance.now() - state.genStart, p = Math.min(1, el / GEN_MS);
     const pct = document.getElementById('genPct'); if (pct) pct.textContent = Math.round(p * 100) + '%';
     const st = document.getElementById('genSteps'); if (st) st.innerHTML = genSteps(p);
-    const i = Math.min(GEN_FACTS.length - 1, Math.floor(el / GEN_FACT_MS)), f = document.getElementById('genFact');
-    if (f && i !== shown) { shown = i; f.style.opacity = 0; setTimeout(() => { if (run === genRun) { f.innerHTML = genFact(i); f.style.opacity = 1; } }, 350); }
+    const i = Math.min(GEN_FACTS.length - 1, Math.floor(el / GEN_FACT_MS)), tr = document.getElementById('genTrack');
+    if (tr && i !== shown) { shown = i; tr.style.transition = ''; tr.style.transform = `translateX(-${i * 100}%)`; document.getElementById('genDots').innerHTML = genDots(i); }
     if (p >= 1) return setTimeout(() => { if (state.screen === 'gen' && run === genRun) go('summary'); }, 400);
     setTimeout(tick, 250);
   };
