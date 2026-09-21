@@ -71,6 +71,16 @@ function close(fromP = 1) {
   if (mode === 'C') { /* затемнение уходит в конце вместе со шторкой */ }
 }
 document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => open(b.dataset.v));
+// Отладка: ?f=op — затемнение прозрачностью на половине, ?f=bg — цветом фона на половине, ?f=bgtint — плюс фон страницы
+const f = new URLSearchParams(location.search).get('f');
+if (f) {
+  document.getElementById('root').innerHTML = `<div class="veil"></div><div class="sheet" style="transform:translateY(40%)"><div class="handle"><i></i></div><h2>Заморожено: ${f}</h2></div>`;
+  const v = document.querySelector('.veil');
+  if (f === 'op') v.style.opacity = .5;
+  if (f === 'bg' || f === 'bgtint') v.style.background = 'rgba(3, 2, 4, .16)';
+  if (f === 'bgtint') tint(.16);
+  if (f === 'none') v.style.opacity = 0;
+}
 // свайп вниз
 let y0 = null, dy = 0, t0 = 0;
 document.addEventListener('touchstart', e => { if (!sheet || !e.target.closest('.sheet')) return; y0 = e.touches[0].clientY; dy = 0; t0 = Date.now(); cancelAnimationFrame(anim); }, { passive: true });
