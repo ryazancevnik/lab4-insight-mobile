@@ -406,7 +406,7 @@ function heroIcon(name) {
   return `<svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HERO[name]}</svg>`;
 }
 function headHTML(ic, title, text, meta) {
-  return `<div class="head"><span class="head-ic">${heroIcon(ic)}</span><h1 class="t-6xl">${title}</h1><p class="b-xl">${text}</p>${meta ? `<p class="b-m muted">${meta}</p>` : ''}</div>`;
+  return `<div class="head"><span class="head-ic">${heroIcon(ic)}</span><h1 class="t-6xl" style="font-size:26px;line-height:32px">${title}</h1><p class="b-xl">${text}</p></div>`;
 }
 function icon(name, size = 20) {
   return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
