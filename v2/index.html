@@ -930,13 +930,10 @@ function vSummary() {
   return `${appBar('Расшифровка')}
     ${headHTML(sc.old ? 'history' : 'drop', big, line, meta)}
     <h2 class="t-3xl sec">Общий вывод</h2>
-    <div class="card"><p class="t-xl">${infection && sc.summaryInfection ? sc.summaryInfection : sc.summary}</p>${control}</div>
+    <p class="b-xl intro" style="margin-top:0">${infection && sc.summaryInfection ? sc.summaryInfection : sc.summary}</p>${control ? `<div style="margin:0 var(--s-16)">${control}</div>` : ''}
     ${hasSys ? `<h2 class="t-3xl sec">Что это значит</h2>${sc.systems.map(id => sysCard(id, sc)).join('')}` : ''}
     ${hasSys && !sc.old ? `<div style="margin-top:var(--s-24)">${qCard(sc)}</div>` : ''}
-    <h2 class="t-3xl sec">${sc.old ? 'Что обновить' : hasSys ? 'Что делать' : 'Чего не хватает до полной картины'}</h2>
-    <div class="what">${whatToDo(sc)}</div>
-    <div class="cells" style="margin-top:var(--s-24)">${normList(sc)}</div>
-    <p class="b-m muted" style="margin:var(--s-24) var(--s-4) 0">Разбор носит рекомендательный характер и не заменяет консультацию врача. Состав панелей и формулировки — заглушка до медицинской редакции.</p>`;
+`;
 }
 
 // Опросник по одному вопросу на сводке
