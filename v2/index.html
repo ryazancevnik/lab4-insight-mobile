@@ -248,6 +248,8 @@
   /* шторка: bottomSheet */
   .veil { position: fixed; inset: 0; background: var(--overlay); z-index: 20; }
   .page { background: var(--bg-base); min-height: 100lvh; }
+  .app { position: relative; }
+  .appbar.frozen { position: absolute; left: 0; right: 0; margin: 0; }
   .sheet.in, .fp.in { animation: sheetIn .38s cubic-bezier(.32, .72, 0, 1); }
   @keyframes sheetIn { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
   .sheet .handle { cursor: grab; touch-action: none; }
@@ -1160,6 +1162,9 @@ function render() {
   }
   lastSheet = state.sheet;
   document.body.classList.toggle('noscroll', !!state.sheet);
+  const ab = document.querySelector('#app .appbar'), appEl = document.getElementById('app');
+  if (ab && state.sheet) { ab.classList.add('frozen'); ab.style.top = Math.max(0, scrollY - appEl.offsetTop) + 'px'; appEl.style.paddingTop = ab.offsetHeight + 'px'; }
+  else appEl.style.paddingTop = '';
   if (state.screen === 'upload' && !state.uploadTimer) startUpload();
 }
 let lastSheet = null;
