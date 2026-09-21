@@ -82,6 +82,7 @@ if (f) {
   if (f === 'none') v.style.opacity = 0;
   if (f === 'gap') { v.style.top = '1px'; }
   if (f === 'gapslow') { v.style.top = '1px'; v.style.opacity = 0; const t0 = performance.now(); const st = now => { const k = Math.min(1, (now - t0) / 10000); v.style.opacity = k; tint(.32 * k); if (k < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }
+  if (f === 'gapslow2') { v.style.top = '1px'; v.style.opacity = 0; const t0 = performance.now(); const st = now => { const k = Math.min(1, (now - t0) / 10000); v.style.opacity = k; const c = BG.map(x => Math.round(x * (1 - .32 * k) + 3 * .32 * k)); const hex = '#' + c.map(x => x.toString(16).padStart(2, '0')).join(''); document.documentElement.style.background = hex; meta.setAttribute('content', hex); if (k < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }
   if (f === 'slowjs') { const t0 = performance.now(); const st = now => { const k = Math.min(1, (now - t0) / 10000); v.style.background = `rgba(3, 2, 4, ${(.32 * k).toFixed(3)})`; if (k < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); }
   if (f === 'slowcss') { v.style.background = 'rgba(3, 2, 4, 0)'; v.style.transition = 'background-color 10s linear'; requestAnimationFrame(() => requestAnimationFrame(() => v.style.background = 'rgba(3, 2, 4, .32)')); }
 }
