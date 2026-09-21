@@ -311,9 +311,9 @@
   @media (prefers-reduced-motion: reduce) { .ich .spin { animation-duration: 2.4s; } }
   /* первый экран */
   .kick { font: 600 12px/16px var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--brand-base); }
-  .lnd-h1 { font: 700 28px/34px var(--font); margin: 6px 0 12px; }
-  .trust { display: flex; gap: 6px; flex-wrap: wrap; }
-  .trust span { display: inline-flex; gap: 4px; align-items: center; font: 500 12px/16px var(--font); color: var(--text-a56); background: #fff; border-radius: 999px; padding: 5px 9px; }
+  .lnd-h1 { font: 700 32px/38px var(--font); margin: 6px 0 14px; }
+  .trust { display: flex; gap: 8px; flex-wrap: wrap; }
+  .trust span { display: inline-flex; gap: 6px; align-items: center; font: 500 14px/18px var(--font); color: var(--text-a56); background: #fff; border-radius: 999px; padding: 7px 12px; }
   .trust svg { color: var(--brand-base); }
   .lnd-ill { position: relative; height: 236px; margin: 22px var(--s-16) 0; max-width: 360px; }
   .lnd-sheet { position: absolute; left: 6px; top: 20px; width: 130px; height: 176px; border-radius: 14px; background: #fff; transform: rotate(-6deg); box-shadow: 0 6px 20px #30393A14; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; }
@@ -787,7 +787,7 @@ function panelCTA(panelId, sc) {
 
 /* ============================ ЭКРАНЫ ============================ */
 function vStart() {
-  const tr = (ic, t) => `<span>${icon(ic, 14)}${t}</span>`;
+  const tr = (ic, t) => `<span>${icon(ic, 16)}${t}</span>`;
   const ln = t => `<div class="lnd-ln"><span>${icon('check', 16)}</span><span class="b-m">${t}</span></div>`;
   const sheet = [60, 95, 80, 90, 55, 85, 70, 92, 65].map(w => `<span style="width:${w}%"></span>`).join('');
   return `${appBar('Lab4U', false).replace(icon('more'), icon('menu'))}
