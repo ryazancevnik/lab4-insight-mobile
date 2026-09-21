@@ -1123,7 +1123,7 @@ function vDetail(id) {
 function bottomBar() {
   if (state.screen === 'start') return `<div class="bar"><button class="btn" data-upload>Загрузить бланк</button><button class="btn btn-sec" data-mine>Мои анализы в Lab4U</button><p class="fine">Не заменяет консультацию врача · для взрослых 18+</p></div>`;
   if (state.screen === 'check') {
-    return `<div class="bar"><button class="btn" data-confirm>Всё верно, получить разбор</button></div>`;
+    return `<div class="bar"><button class="btn" data-confirm>Верно, получить разбор</button></div>`;
   }
   if ((state.screen === 'summary' || state.screen === 'detail') && state.picked.size) {
     const n = state.picked.size;
