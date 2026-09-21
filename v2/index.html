@@ -321,6 +321,26 @@
   .upbar { height: 6px; border-radius: 3px; background: var(--brand-bg); overflow: hidden; margin-top: 14px; }
   .upbar b { display: block; height: 100%; width: 100%; border-radius: 3px; background: var(--brand-base); transform-origin: left; animation: upfill 4.9s linear forwards; }
   @keyframes upfill { from { transform: scaleX(.04); } to { transform: scaleX(1); } }
+  /* экран генерации разбора */
+  body.gen-mode, body.gen-mode .page { background: var(--brand-base); }
+  .gen { color: #fff; min-height: 100lvh; position: relative; padding: 0 4px; }
+  .gen .cap { font: 600 12px/16px var(--font); letter-spacing: .06em; text-transform: uppercase; opacity: .8; }
+  .gen .fact-i { text-align: center; padding-top: 56px; transition: opacity .35s; }
+  .gen .num { font: 800 52px/60px var(--font); letter-spacing: -.02em; margin-top: 22px; white-space: nowrap; }
+  .gen .txt { font: 500 19px/26px var(--font); margin-top: 14px; }
+  .gen .dots { display: flex; gap: 6px; justify-content: center; margin-top: 24px; }
+  .gen .dots i { width: 6px; height: 6px; border-radius: 3px; background: #FFFFFF59; transition: width .3s, background .3s; }
+  .gen .dots i.on { width: 18px; background: #fff; }
+  .gen .card-g { position: fixed; left: 50%; transform: translateX(-50%); width: calc(min(640px, 100%) - 32px); bottom: calc(16px + env(safe-area-inset-bottom)); background: #FFFFFF1F; border-radius: 20px; padding: 18px; }
+  .gen .pbar { height: 6px; border-radius: 3px; background: #FFFFFF40; overflow: hidden; margin: 10px 0 8px; }
+  .gen .pbar b { display: block; height: 100%; width: 100%; background: #fff; border-radius: 3px; transform-origin: left; animation: genfill var(--gen-ms) linear forwards; }
+  @keyframes genfill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  .gen .st { display: flex; gap: 10px; align-items: center; font: 500 15px/20px var(--font); padding: 7px 0; transition: opacity .3s; }
+  .gen .st .c { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; flex: none; box-sizing: border-box; }
+  .gen .st .c.ok { background: #fff; color: var(--brand-base); }
+  .gen .st .c.sp { border: 2.5px solid #FFFFFF59; border-top-color: #fff; animation: spin .8s linear infinite; }
+  .gen .st .c.em { border: 2px solid #FFFFFF59; }
+  .gen .st.dim { opacity: .6; }
   .ich .spin { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid var(--brand-bg); border-top-color: var(--brand-base); flex: none; box-sizing: border-box; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .ich .spin { animation-duration: 2.4s; } }
@@ -864,6 +884,52 @@ function sheetLogin() {
     <button class="b b1 on" data-login>Войти</button><button class="b b2" data-reg>Новый пользователь</button>${tail}</div></div>`;
 }
 
+// Факты на экране ожидания. ⚠️ 18 276 — условная цифра, 300 000+ и холестерин уточнить (ДИЗАЙН_v2, раздел 5а)
+const GEN_FACTS = [
+  ['300 000+', 'анализов уже расшифровали в Lab4U. Знаем, на что обращать внимание в ваших результатах'],
+  ['54%', 'людей с диабетом 2 типа в России не знали о нём, пока не сдали анализ. Проверка сахара раз в год помогает заметить изменения вовремя'],
+  ['1 из 4', 'взрослых думает, что о холестерине можно не беспокоиться, пока нет симптомов. А чтобы увидеть полную картину, одного общего холестерина мало: нужен липидный профиль из 4 показателей'],
+  ['18 276', 'пациентов Lab4U следят за динамикой показателей в личном кабинете'],
+  ['до 50%', 'скидка на анализы в Lab4U: вы оформляете и оплачиваете заказ онлайн, а анализаторы работают автоматически'],
+];
+const GEN_STEPS = ['Сверяем показатели с нормами', 'Ищем связи между отклонениями', 'Подбираем, что стоит досдать', 'Собираем разбор'];
+const GEN_FACT_MS = 4000, GEN_MS = GEN_FACT_MS * GEN_FACTS.length;
+function genFact(i) {
+  const [num, txt] = GEN_FACTS[i];
+  return `<p class="cap">Факт ${i + 1} из ${GEN_FACTS.length}</p><p class="num">${num}</p><p class="txt">${txt}</p>
+    <div class="dots">${GEN_FACTS.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>`;
+}
+function genSteps(p) {
+  const cur = Math.min(GEN_STEPS.length - 1, Math.floor(p * GEN_STEPS.length));
+  return GEN_STEPS.map((t, k) => { const st = k < cur ? 'ok' : k === cur ? 'sp' : 'em';
+    return `<div class="st${st === 'em' ? ' dim' : ''}"><span class="c ${st}">${st === 'ok' ? icon('check', 14) : ''}</span>${t}</div>`; }).join('');
+}
+function vGen() {
+  const el = state.genStart ? performance.now() - state.genStart : 0, p = Math.min(1, el / GEN_MS);
+  return `<div class="gen" style="--gen-ms:${GEN_MS}ms">
+    <div class="fact-i" id="genFact">${genFact(Math.min(GEN_FACTS.length - 1, Math.floor(el / GEN_FACT_MS)))}</div>
+    <div class="card-g" role="progressbar" aria-label="Готовим разбор">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><p style="font:700 17px/22px var(--font)">Готовим разбор</p><p style="font:600 15px/20px var(--font)" id="genPct">${Math.round(p * 100)}%</p></div>
+      <div class="pbar"><b style="animation-delay:-${Math.round(el)}ms"></b></div>
+      <div id="genSteps">${genSteps(p)}</div>
+    </div></div>`;
+}
+// Ход генерации: процент и этапы обновляются часто, факт — раз в 4 секунды с плавной сменой; в конце — сводка
+let genRun = 0;
+function startGen() {
+  state.genStart = performance.now(); const run = ++genRun; let shown = 0;
+  const tick = () => {
+    if (state.screen !== 'gen' || run !== genRun) return;
+    const el = performance.now() - state.genStart, p = Math.min(1, el / GEN_MS);
+    const pct = document.getElementById('genPct'); if (pct) pct.textContent = Math.round(p * 100) + '%';
+    const st = document.getElementById('genSteps'); if (st) st.innerHTML = genSteps(p);
+    const i = Math.min(GEN_FACTS.length - 1, Math.floor(el / GEN_FACT_MS)), f = document.getElementById('genFact');
+    if (f && i !== shown) { shown = i; f.style.opacity = 0; setTimeout(() => { if (run === genRun) { f.innerHTML = genFact(i); f.style.opacity = 1; } }, 350); }
+    if (p >= 1) return setTimeout(() => { if (state.screen === 'gen' && run === genRun) go('summary'); }, 400);
+    setTimeout(tick, 250);
+  };
+  setTimeout(tick, 250);
+}
 function vUpload() {
   const sc = S(), f = sc.file || { name: 'Бланк.pdf', size: '', kind: 'pdf' }, done = state.stagesDone;
   const st = [['Файл получен, читаем бланк', true], [`Нашли ${plural(sc.ind.length, 'показатель', 'показателя', 'показателей')}`, done >= 2], ['Сверяем с нормами лаборатории', done >= 3]];
@@ -1154,7 +1220,8 @@ function sheetCart() {
 
 /* ============================ РЕНДЕР И НАВИГАЦИЯ ============================ */
 function render() {
-  const views = { start: vStart, orders: vOrders, upload: vUpload, check: vCheck, summary: vSummary, detail: () => vDetail(state.sys) };
+  const views = { start: vStart, orders: vOrders, upload: vUpload, check: vCheck, gen: vGen, summary: vSummary, detail: () => vDetail(state.sys) };
+  document.body.classList.toggle('gen-mode', state.screen === 'gen');
   // лента карточек анализов не должна прыгать в начало после выбора
   const segX = {}; document.querySelectorAll('[data-seg]').forEach(e => { segX[e.dataset.seg] = e.scrollLeft; });
   document.getElementById('app').innerHTML = (views[state.screen] || vStart)();
@@ -1172,6 +1239,7 @@ function render() {
   lastSheet = state.sheet;
   document.body.classList.toggle('noscroll', !!state.sheet);
   if (state.screen === 'upload' && !state.uploadTimer) startUpload();
+  if (state.screen === 'gen' && !state.genStart) startGen();
 }
 let lastSheet = null;
 // Закрыть шторку: уезжает вниз, фон гаснет
@@ -1215,7 +1283,7 @@ function closeSheet() {
   document.addEventListener('mousemove', e => { if (el) move(e, e.clientY); });
   document.addEventListener('mouseup', end);
 })();
-function go(screen, restore = false) { state.screen = screen; state.sheet = null; render(); window.scrollTo(0, restore ? state.summaryY : 0); }
+function go(screen, restore = false) { if (screen === 'gen') state.genStart = 0; state.screen = screen; state.sheet = null; render(); window.scrollTo(0, restore ? state.summaryY : 0); }
 let uploadRun = 0;
 function startUpload() {
   state.uploadTimer = true; state.uploadStart = performance.now(); const run = ++uploadRun;
@@ -1275,7 +1343,7 @@ document.addEventListener('click', e => {
   if (d.pickall) { d.pickall.split(',').forEach(c => state.picked.add(c)); return render(); }
   if (d.sheet) { state.sheet = d.sheet; return render(); }
   if ('close' in d) return closeSheet();
-  if ('confirm' in d) { if (ent() === 'A' && !state.loggedIn) { state.after = 'summary'; state.reg = false; state.sheet = 'login'; return render(); } return go('summary'); }
+  if ('confirm' in d) { if (ent() === 'A' && !state.loggedIn) { state.after = 'gen'; state.reg = false; state.sheet = 'login'; return render(); } return go('gen'); }
   if ('register' in d) { return go('summary'); }
   if (d.anchor) { go('summary'); const el = document.getElementById(d.anchor); if (el) el.scrollIntoView({ block: 'start' }); window.scrollBy(0, -64); }
 });
