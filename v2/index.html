@@ -247,10 +247,7 @@
 
   /* шторка: bottomSheet */
   .veil { position: fixed; inset: 0; background: var(--overlay); z-index: 20; }
-  .veil { position: absolute !important; left: 0; right: 0; bottom: auto !important; height: 100lvh; opacity: 0; }
   .page { background: var(--bg-base); min-height: 100lvh; }
-  .app { position: relative; }
-  .appbar.frozen { position: absolute; left: 0; right: 0; margin: 0; }
   .sheet.in, .fp.in { animation: sheetIn .38s cubic-bezier(.32, .72, 0, 1); }
   @keyframes sheetIn { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
   .sheet .handle { cursor: grab; touch-action: none; }
@@ -1161,39 +1158,17 @@ function render() {
   if (state.sheet && state.sheet !== lastSheet) {
     document.querySelector('#sheet .sheet, #sheet .fp')?.classList.add('in');
   }
-  const veilEl = document.querySelector('#sheet .veil');
-  if (veilEl) { veilEl.style.top = scrollY + 'px'; if (state.sheet && !lastSheet) fadeVeil(0, 1, 380); else dimTo(1); }
-  else if (!state.sheet) dimTo(0);
   lastSheet = state.sheet;
   document.body.classList.toggle('noscroll', !!state.sheet);
-  const ab = document.querySelector('#app .appbar'), appEl = document.getElementById('app');
-  if (ab && state.sheet) { ab.classList.add('frozen'); ab.style.top = Math.max(0, scrollY - appEl.offsetTop) + 'px'; appEl.style.paddingTop = ab.offsetHeight + 'px'; }
-  else appEl.style.paddingTop = '';
   if (state.screen === 'upload' && !state.uploadTimer) startUpload();
 }
-let lastSheet = null, dimK = 0, veilAnim = 0;
-// Затемнение k = 0…1. Safari красит полосу статуса по фону body и следит за ним покадрово,
-// а фиксированные слои считывает один раз — поэтому затемнение обычным слоем, а body того же тона
-function dimTo(k) {
-  dimK = Math.max(0, Math.min(1, k));
-  const v = document.querySelector('#sheet .veil'); if (v) v.style.opacity = dimK;
-  const a = 0.32 * dimK, c = [241, 242, 244].map(x => Math.round(x * (1 - a) + 3 * a));
-  const col = dimK ? `rgb(${c.join(',')})` : '';
-  document.body.style.backgroundColor = col; document.documentElement.style.backgroundColor = col;
-}
-function fadeVeil(from, to, ms) {
-  cancelAnimationFrame(veilAnim); const t0 = performance.now();
-  const ease = t => to > from ? 1 - Math.pow(1 - t, 3) : t * t;
-  const step = now => { const t = Math.min(1, (now - t0) / ms); dimTo(from + (to - from) * ease(t)); if (t < 1) veilAnim = requestAnimationFrame(step); };
-  veilAnim = requestAnimationFrame(step);
-}
+let lastSheet = null;
 // Закрыть шторку: уезжает вниз, фон гаснет
 function closeSheet() {
   const el = document.querySelector('#sheet .sheet, #sheet .fp'), veil = document.querySelector('#sheet .veil');
   const done = () => { state.sheet = null; render(); };
-  if (!el) { dimTo(0); return done(); }
+  if (!el) return done();
   el.style.transition = 'transform .26s cubic-bezier(.4, 0, 1, 1)'; el.style.transform = 'translate(-50%, 100%)';
-  fadeVeil(dimK, 0, 260);
   setTimeout(done, 260);
 }
 // Свайп вниз: тянем за ручку или за шторку, когда она прокручена к началу
@@ -1208,14 +1183,14 @@ function closeSheet() {
     if (!el) return; dy = Math.max(0, y - y0);
     if (dy > 4) moved = true; if (!moved) return;
     if (e.cancelable) e.preventDefault();
-    el.style.transition = 'none'; el.style.transform = `translate(-50%, ${dy}px)`; cancelAnimationFrame(veilAnim); dimTo(1 - dy / el.offsetHeight);
+    el.style.transition = 'none'; el.style.transform = `translate(-50%, ${dy}px)`;
   };
   const end = () => {
     if (!el) return; const s = el; el = null;
     if (!moved) return;
     const v = dy / Math.max(1, Date.now() - t0);
     if (dy > s.offsetHeight * 0.3 || v > 0.6) return closeSheet();
-    s.style.transition = 'transform .3s cubic-bezier(.32, .72, 0, 1)'; s.style.transform = ''; fadeVeil(dimK, 1, 300);
+    s.style.transition = 'transform .3s cubic-bezier(.32, .72, 0, 1)'; s.style.transform = '';
     // не считать отпускание кликом по кнопке
     const stop = ev => { ev.stopPropagation(); ev.preventDefault(); }; document.addEventListener('click', stop, { capture: true, once: true }); setTimeout(() => document.removeEventListener('click', stop, { capture: true }), 50);
   };
@@ -1305,6 +1280,6 @@ if (location.search.includes('debug')) {
   const dbg = document.createElement('div'); dbg.style.cssText = 'position:fixed;left:8px;top:60px;z-index:99;background:#000c;color:#0f0;font:11px monospace;padding:4px 6px;border-radius:6px;max-width:90vw;pointer-events:none';
   document.addEventListener('DOMContentLoaded', () => document.body.appendChild(dbg));
   const errs = []; window.addEventListener('error', e => errs.push(e.message + ' @' + e.lineno));
-  setInterval(() => { const v = document.querySelector('#sheet .veil'); dbg.textContent = `k=${dimK.toFixed(2)} veil=${v ? v.style.opacity + '/' + getComputedStyle(v).opacity : '-'} body=${document.body.style.backgroundColor} ${errs.join(' | ')}`; }, 200);
+  setInterval(() => { const v = document.querySelector('#sheet .veil'); dbg.textContent = `veil=${v ? v.style.opacity + '/' + getComputedStyle(v).opacity : '-'} body=${document.body.style.backgroundColor} ${errs.join(' | ')}`; }, 200);
 }
 </script>
