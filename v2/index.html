@@ -821,7 +821,7 @@ function vStart() {
 function sheetUpload() {
   const src = (ic, t) => `<button class="card" data-files style="margin:0;padding:14px 6px;display:grid;justify-items:center;gap:6px;background:var(--bg-base)"><span class="ic brand">${icon(ic)}</span><span class="t-l">${t}</span></button>`;
   return `<div class="veil" data-close></div><div class="sheet" role="dialog" aria-label="Загрузка бланка"><div class="handle"><i></i></div>
-    <div class="shead"><div><p class="t-3xl">Загрузите бланк</p><p class="b-l muted" style="margin-top:4px">Общий анализ крови, биохимия, гормоны.<br>Прикрепите результаты анализов одним файлом.</p></div><button class="rbtn" data-close aria-label="Закрыть">${icon('close', 18)}</button></div>
+    <div class="shead"><div><p class="t-3xl">Загрузите бланк</p><p class="b-l muted" style="margin-top:4px">Чтобы получить максимально точную расшифровку, рекомендуем загружать результаты только одной сдачи анализов, наиболее свежие по дате сдачи.</p></div><button class="rbtn" data-close aria-label="Закрыть">${icon('close', 18)}</button></div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">${src('file', 'Файл')}${src('image', 'Галерея')}${src('camera', 'Снять фото')}</div>
     <p class="b-m muted" style="margin-top:16px">Мы не храним распознанные документы: после распознавания они удаляются. Загружая документ, я даю согласие на обработку персональных данных в соответствии с <span class="link">Политикой обработки персональных данных</span></p></div>`;
 }
