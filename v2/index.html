@@ -1382,7 +1382,7 @@ document.addEventListener('click', e => {
   if (d.pickall) { d.pickall.split(',').forEach(c => state.picked.add(c)); return render(); }
   if (d.sheet) { state.sheet = d.sheet; return render(); }
   if ('close' in d) return closeSheet();
-  if ('confirm' in d) { if (ent() === 'A' && !state.loggedIn) { state.after = 'gen'; state.reg = false; state.sheet = 'login'; return render(); } return go('gen'); }
+  if ('confirm' in d) { if (ent() === 'A' && !state.loggedIn) { state.after = 'gen'; state.reg = true; state.sheet = 'login'; return render(); } return go('gen'); }
   if ('register' in d) { return go('summary'); }
   if (d.anchor) { go('summary'); const el = document.getElementById(d.anchor); if (el) el.scrollIntoView({ block: 'start' }); window.scrollBy(0, -64); }
 });
