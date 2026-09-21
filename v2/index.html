@@ -327,6 +327,7 @@
   /* первый экран */
   .kick { font: 600 12px/16px var(--font); letter-spacing: .06em; text-transform: uppercase; color: var(--brand-base); }
   .lnd-h1 { font: 700 32px/38px var(--font); margin: 6px 0 14px; }
+  .lnd-h1 .mega { width: .9em; height: .9em; color: var(--brand-base); vertical-align: -.1em; margin-left: .05em; }
   .trust { display: flex; gap: 8px; flex-wrap: wrap; }
   .trust span { display: inline-flex; gap: 6px; align-items: center; font: 500 14px/18px var(--font); color: var(--text-a56); background: #fff; border-radius: 999px; padding: 7px 12px; }
   .trust svg { color: var(--brand-base); }
@@ -813,7 +814,7 @@ function vStart() {
   return `${appBar('Lab4U', false).replace(icon('more'), icon('menu'))}
     <div style="padding:4px var(--s-16) 0">
       <p class="kick">Расшифровка анализов</p>
-      <h1 class="lnd-h1">Поймите, что показывают ваши анализы</h1>
+      <h1 class="lnd-h1">Узнайте,<br>о чём говорят <svg class="mega" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4a1 1 0 0 0 1 1h3l9 5V4L7 9H4a1 1 0 0 0-1 1z"/><path d="M7 15v4a1 1 0 0 0 1 1h1.5a1 1 0 0 0 1-1v-3"/><path d="M19.5 9.5a3.5 3.5 0 0 1 0 5"/></svg><br>ваши анализы</h1>
       <div class="trust">${tr('gift', 'Бесплатно')}${tr('clock', 'Около 5 минут')}${tr('flask', 'Любая лаборатория')}</div>
     </div>
     <div class="lnd-ill" aria-hidden="true">
