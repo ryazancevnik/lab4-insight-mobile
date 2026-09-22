@@ -356,6 +356,7 @@
   .cells:has(.ck-more) { padding-bottom: 0 !important; }
   .ordc { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; }
   .ordc + h2.sec { margin-top: var(--s-24); }
+  body.nobar .app { padding-bottom: calc(var(--s-24) + env(safe-area-inset-bottom)); }
   .oc-top { display: flex; justify-content: space-between; align-items: center; gap: var(--s-12); }
   .oc-name { margin-top: 2px; }
   .opill { flex: none; font-size: 14px; line-height: 20px; font-weight: 500; padding: 4px 12px; border-radius: 999px; background: var(--brand-bg); color: var(--brand-base); }
@@ -737,9 +738,9 @@ const SCENARIOS = {
     entry: 'B', old: false, person: { sex: 'м', age: 34 }, date: '21 августа', lab: 'сдача в Lab4U',
     ind: toInd(cbcMale(true)), history: [{ code: 'ferritin', value: 64, ref: [30, 400], date: '2 июля 2026' }], systems: [],
     orders: [
-      { id: 'o1', num: '9777031245', res: '21.08.2026', date: '21 августа 2026', name: 'Общий анализ крови, ферритин, альбумин', n: 23, note: '4 вне нормы', badge: 'Новый', go: 1 },
-      { id: 'o2', num: '9777027710', res: '02.07.2026', date: '2 июля 2026', name: 'Общий анализ крови с лейкоцитарной формулой', n: 20, note: 'всё в норме', go: 2 },
-      { id: 'o3', num: '9777019432', res: '09.12.2025', date: '9 декабря 2025', name: 'Липидный профиль, глюкоза', n: 7, old: true },
+      { id: 'o1', num: '9777031245', res: ['22.08.2026', '23.08.2026'], na: 3, date: '21 августа 2026', name: 'Общий анализ крови, ферритин, альбумин', n: 23, note: '4 вне нормы', badge: 'Новый', go: 1 },
+      { id: 'o2', num: '9777027710', res: ['03.07.2026', '04.07.2026'], na: 1, date: '2 июля 2026', name: 'Общий анализ крови с лейкоцитарной формулой', n: 20, note: 'всё в норме', go: 2 },
+      { id: 'o3', num: '9777019432', res: ['10.12.2025', '12.12.2025'], na: 2, date: '9 декабря 2025', name: 'Липидный профиль, глюкоза', n: 7, old: true },
     ],
     summary: 'Все 20 показателей в норме, ферритин из истории тоже. Отдельно ничего делать не нужно — ниже то, что обычно проверяют раз в год.',
     doctorQs: [],
@@ -1183,14 +1184,14 @@ function vUpload() {
 function vOrders() {
   const sc = SCENARIOS[2];
   // карточки как заказы в личном кабинете Lab4U, сокращённые: номер и статус, состав, дата результатов и число показателей; нажимается вся карточка
-  // ⚠️ номера заказов условные
+  // ⚠️ номера заказов и даты результатов условные
   const pill = o => o.badge ? `<span class="opill">${o.badge}</span>` : o.old ? '<span class="opill old">Старше 3 месяцев</span>' : '';
   return `${appBar('Расшифровка')}
     ${headHTML('tubes', 'Какие анализы разобрать?', 'Ваши результаты в Lab4U')}
     <div style="margin-top:var(--s-24)">${sc.orders.map(o => `<button class="card tap ordc" data-order="${o.id}">
         <span class="oc-top"><span class="t-xl">Заказ ${o.num}</span>${pill(o)}</span>
-        <span class="b-l oc-name">${o.name}</span>
-        <span class="b-m muted num">Результаты от ${o.res}, ${plural(o.n, 'показатель', 'показателя', 'показателей')}${o.note ? ', ' + o.note : ''}</span>
+        <span class="b-l oc-name">${plural(o.na, 'анализ', 'анализа', 'анализов')}</span>
+        <span class="b-m muted num">Результаты с ${o.res[0]} по ${o.res[1]}</span>
         ${state.stub['order' + o.id] ? '<span class="stub" style="display:block;margin-top:6px">Заглушка: разбор старой сдачи в прототипе пока не собран.</span>' : ''}</button>`).join('')}
       <h2 class="t-3xl sec">Или</h2>
       <button class="card tap ordc" data-upload><span class="oc-top"><span class="t-xl">Бланк другой лаборатории</span><span class="link b-l">Загрузить</span></span><span class="b-m muted">Фото или PDF</span></button>
@@ -1530,7 +1531,9 @@ function render() {
   const views = { start: vStart, orders: vOrders, upload: vUpload, check: vCheck, gen: vGen, summary: vSummary, detail: () => vDetail(state.sys) };
   document.body.classList.toggle('gen-mode', state.screen === 'gen');
   // первый экран и чтение бланка помещаются целиком — без вертикального скролла
-  document.body.classList.toggle('fit', state.screen === 'start' || state.screen === 'upload' || state.screen === 'orders');
+  document.body.classList.toggle('fit', state.screen === 'start' || state.screen === 'upload');
+  // выбор анализов: скролл нужен (на телефоне экран ниже 812), но без запаса под нижнюю панель — её здесь нет
+  document.body.classList.toggle('nobar', state.screen === 'orders');
   // лента карточек анализов не должна прыгать в начало после выбора
   const segX = {}; document.querySelectorAll('[data-seg]').forEach(e => { segX[e.dataset.seg] = e.scrollLeft; });
   document.getElementById('app').innerHTML = (views[state.screen] || vStart)();
