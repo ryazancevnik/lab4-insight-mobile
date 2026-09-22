@@ -398,6 +398,12 @@
   .cta-d-arr { width: 32px; height: 32px; border-radius: 50%; background: #FFFFFF33; color: #fff; display: grid; place-items: center; flex: none; }
   .pl-step { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--stroke-a4); }
   .pl-step:first-child { border-top: 0; padding-top: 0; } .pl-step:last-child { padding-bottom: 0; }
+  .pl-g { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 4px; }
+  .pl-g2 { margin-top: var(--s-16); padding-top: var(--s-16); border-top: 1px solid var(--stroke-a12); }
+  .pl-g + .miss { border-top: 1px solid var(--stroke-a4); }
+  .pl-doc { margin-top: var(--s-24); display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; }
+  .pl-doc img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: 50% 25%; }
+  .pl-doc .btn, .pl-doc .stub { grid-column: 1 / -1; }
   .pl-n { width: 28px; height: 28px; border-radius: 50%; background: var(--brand-bg); color: var(--brand-base); font: 700 14px/28px var(--font); text-align: center; }
   /* страница темы в шторке */
   .sheet.sheet-th { background: var(--bg-base); max-height: none; height: calc(100dvh - 48px); padding: 0 var(--s-16) calc(var(--s-24) + env(safe-area-inset-bottom)) !important; }
@@ -934,17 +940,30 @@ function themeGroups(sc) {
   const g = (t, ids) => ids.length ? `<h2 class="t-3xl sec">${t}</h2>${ids.map(id => themeCard(id, sc)).join('')}` : '';
   return g(sc.old ? 'Тогда требовало внимания' : 'Требует внимания', attn) + g(sc.old ? 'Тогда требовало наблюдения' : 'Требует наблюдения', watch);
 }
-// План: всё, что стоит досдать по темам, одним заказом, и один врач
+// План: полный список недостающих анализов одной карточкой, по темам, где мы их советуем; общий для двух тем — один раз
 function planBlock(sc) {
-  const buys = [...new Set(sc.systems.filter(id => sysStatus(sc, id) !== 'exp').flatMap(id => (SYSTEMS[id].missing || []).map(m => m.buy)))];
-  const sum = buys.reduce((a, c) => a + CATALOG[c].price, 0), all = buys.length && buys.every(c => state.picked.has(c));
-  const btn = all ? `<button class="btn on" data-unpick="${buys.join(',')}">${icon('check', 18)} ${plural(buys.length, 'анализ', 'анализа', 'анализов')} в заказе</button>`
-    : `<button class="btn split" data-pick="${buys.join(',')}"><span>Добавить все</span><span class="num">${fmt(sum)} ₽</span></button>`;
-  return `<h2 class="t-3xl sec">Что делать дальше</h2><div class="card">
-    <div class="pl-step"><span class="pl-n">1</span><div><p class="t-xl">Досдать ${plural(buys.length, 'анализ', 'анализа', 'анализов')}</p><p class="b-xl muted" style="margin-top:2px">${buys.map(c => CATALOG[c].name).join(', ')}</p><div style="margin-top:12px">${btn}</div></div></div>
-    <div class="pl-step"><span class="pl-n">2</span><div><p class="t-xl">Показать результаты терапевту</p><p class="b-xl muted" style="margin-top:2px">Один врач по всем темам. Лучше прийти уже с досданными анализами</p>
-      <button class="btn btn-sec" style="margin-top:12px" data-stub="doctor">Записаться к терапевту</button>${state.stub.doctor ? '<p class="stub" style="margin-top:8px">Заглушка: переход в Медорию.</p>' : ''}</div></div>
-  </div>`;
+  const seen = {}, groups = [];
+  sc.systems.filter(id => sysStatus(sc, id) !== 'exp' && (SYSTEMS[id].missing || []).length).forEach(id => {
+    const rows = [];
+    SYSTEMS[id].missing.forEach(m => {
+      if (seen[m.buy]) { seen[m.buy].also.push(SYSTEMS[id].name.toLowerCase()); return; }
+      seen[m.buy] = { ...m, also: [] }; rows.push(seen[m.buy]);
+    });
+    if (rows.length) groups.push({ id, rows });
+  });
+  const buys = Object.keys(seen); if (!buys.length) return '';
+  const rest = buys.filter(c => !state.picked.has(c)), restSum = rest.reduce((a, c) => a + CATALOG[c].price, 0);
+  const lvl = id => SYS_SUMMARY[id].level === 'attn' ? 'требует внимания' : 'требует наблюдения';
+  const row = m => { const on = state.picked.has(m.buy);
+    return `<div class="miss"><div><p class="t-l">${CATALOG[m.buy].name}</p><p class="b-m muted">${m.why}${m.also.length ? ', нужен и для темы «' + m.also.join('», «') + '»' : ''}</p></div><p class="t-l num">${fmt(CATALOG[m.buy].price)} ₽</p><button class="add${on ? ' on' : ''}" data-toggle="${m.buy}" aria-label="${on ? 'Убрать' : 'Добавить'}">${on ? '✓' : '+'}</button></div>`; };
+  const btn = !rest.length ? `<button class="btn all" data-unpick="${buys.join(',')}">${icon('check', 18)} Все добавлено</button>`
+    : `<button class="btn split" data-pick="${rest.join(',')}"><span>${rest.length === buys.length ? 'Добавить все ' + plural(buys.length, 'анализ', 'анализа', 'анализов') : 'Добавить ещё ' + rest.length}</span><span class="num">${fmt(restSum)} ₽</span></button>`;
+  return `<h2 class="t-3xl sec">Что делать дальше</h2>
+    <p class="b-xl intro">Анализы, которые покажут причину, по темам</p>
+    <div class="card">${groups.map((g, k) => `<div class="pl-g${k ? ' pl-g2' : ''}"><p class="t-xl">${SYSTEMS[g.id].name}</p><p class="b-m muted">${lvl(g.id)}</p></div>${g.rows.map(row).join('')}`).join('')}</div>
+    <div style="margin-top:var(--s-12)">${btn}</div>
+    <div class="card pl-doc"><img src="${DOC_PHOTO}" alt="Терапевт"><div><p class="t-xl">Показать результаты терапевту</p><p class="b-l muted" style="margin-top:2px">Один врач по всем темам. Лучше прийти с досданными анализами</p></div>
+      <button class="btn btn-sec" data-stub="doctor">Записаться к терапевту</button>${state.stub.doctor ? '<p class="stub">Заглушка: переход в Медорию.</p>' : ''}</div>`;
 }
 function sheetTheme() {
   const s = SYSTEMS[state.sys], body = vDetail(state.sys).replace(appBar(s.name), '');
