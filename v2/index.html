@@ -1492,7 +1492,8 @@ function vDetail(id) {
 function bottomBar() {
   if (state.screen === 'start') return `<div class="bar"><button class="btn" data-upload>Загрузить бланк</button><button class="btn btn-sec" data-mine>Мои анализы в Lab4U</button><p class="fine">Не заменяет консультацию врача · для взрослых 18+</p></div>`;
   if (state.screen === 'check') {
-    return `<div class="bar"><button class="btn" data-confirm>Верно, получить разбор</button></div>`;
+    const left = S().old ? 0 : ckQs().filter(q => !state.answers[q.id]).length;
+    return `<div class="bar"><button class="btn" data-confirm${left ? ' disabled' : ''}>Верно, получить разбор</button>${left ? `<p class="fine">Ответьте на вопросы о сдаче, ${left === 1 ? 'остался 1' : 'осталось ' + left}</p>` : ''}</div>`;
   }
   if ((state.screen === 'summary' || state.screen === 'detail') && state.picked.size) {
     const n = state.picked.size;
