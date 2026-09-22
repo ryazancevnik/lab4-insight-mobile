@@ -1416,9 +1416,7 @@ function vDetail(id) {
         <div style="margin-top:8px">${miss.map(m => { const on = state.picked.has(m.buy);
           return `<div class="miss"><div><p class="t-l">${CATALOG[m.buy].name}</p><p class="b-m muted">${m.why}</p></div><p class="t-l num">${fmt(CATALOG[m.buy].price)} ₽</p><button class="add${on ? ' on' : ''}" data-toggle="${m.buy}" aria-label="${on ? 'Убрать' : 'Добавить'}">${on ? '✓' : '+'}</button></div>`; }).join('')}</div>
         <div style="margin-top:8px">${btn}</div></div>`;
-  } else if (s.retest) {
-    more = `<h2 class="t-3xl sec">Чтобы убедиться, что это временно</h2><p class="b-xl intro">${s.retest.intro}</p>
-      <div class="card"><p class="t-xl">${s.retest.title}</p><div style="margin-top:12px">${retestBtn()}</div>${state.stub.retest ? '<p class="stub" style="margin-top:8px">Пришлём напоминание 6 октября, за три дня. Заглушка.</p>' : ''}</div>`;
+
   }
   // для сравнения: у темы с missInline недостающие анализы — сразу блоком «Собрано N из M» под показателями
   const inline = s.missInline && !sc.old && moreHead;
