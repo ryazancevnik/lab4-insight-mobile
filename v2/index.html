@@ -299,7 +299,7 @@
   .indc .ind { padding: 0; border-top: 0; }
   .ind-none { background: transparent; box-shadow: inset 0 0 0 1px var(--stroke-a12); }
   .ind-none .ind { opacity: .45; }
-  .chip.none { background: transparent; color: var(--text-a56); box-shadow: inset 0 0 0 1px var(--stroke-a12); }
+  .chip.none { background: var(--mono-700); color: #fff; }
   .btn.all { background: var(--success); color: #fff; box-shadow: none; }
   .ind .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .ind .row .t-l .chip { margin-left: 8px; }
@@ -313,6 +313,8 @@
   .covb i { display: block; height: 100%; border-radius: 4px; }
   .srcdoc { display: block; margin-top: 4px; font-size: 12px; line-height: 16px; color: #00AACCA6; }
   .srcdoc svg { vertical-align: -2px; margin-right: 4px; }
+  .srcs { margin: var(--s-12) var(--s-16) 0; }
+  .srcs .srcdoc { margin-top: 0; font-size: 13px; line-height: 18px; }
   .docph { display: block; width: 100%; height: 180px; object-fit: cover; object-position: 50% 30%; }
   .qcard + .card, .qcard + .act { margin-top: var(--s-12); }
   .ck-more { padding: var(--s-20) var(--s-16) var(--s-16); }
@@ -1277,9 +1279,18 @@ function indRow(i) {
   return `<div class="ind"><div class="row"><p class="t-l">${IND[i.code].short || IND[i.code].name}${chip(i)}</p><p class="val num">${fv(i.value)}<small>${IND[i.code].unit}</small></p></div>${scaleHTML(i, i.status)}</div>`;
 }
 // Недостающий показатель: погасшая карточка — только зона нормы, без значения и отметки
+// Нормы с карточек анализов на lab4u.ru (22.09.2026): CRP, антитела к тТГ IgA, ColonView, белок в общем анализе мочи
+const MISS_REF = {
+  crp: { ref: [0, 5], unit: 'мг/л' },
+  celiac: { ref: [0, 10], unit: 'Ед/мл' },
+  urine: { ref: [0, 0.14], unit: 'г/л', label: 'белок' },
+  fecal_blood: { text: 'норма: не обнаружено' },
+};
 function missRow(buy) {
-  const n = IND[buy] ? (IND[buy].short || IND[buy].name) : CATALOG[buy].name;
-  return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p><p class="val num">—</p></div><div class="scale"><span class="z"></span></div><div class="scale-l"></div></div>`;
+  const n = IND[buy] ? (IND[buy].short || IND[buy].name) : CATALOG[buy].name, r = MISS_REF[buy] || {};
+  const lab = r.ref ? `<div class="scale-l num"><span style="left:25%">${fv(r.ref[0])}</span><span style="left:75%">${fv(r.ref[1])}</span></div>`
+    : `<div class="scale-l"><span style="left:50%">${r.text || ''}</span></div>`;
+  return `<div class="ind"><div class="row"><p class="t-l">${n}${r.label ? ' (' + r.label + ')' : ''}<span class="chip none">не сдан</span></p><p class="val num">—<small>${r.unit || ''}</small></p></div><div class="scale"><span class="z"></span></div>${lab}</div>`;
 }
 const DOCSVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>';
 function themeMissing(sc, id) {
@@ -1295,7 +1306,8 @@ function vDetail(id) {
   if (!sc.old && id === 'iron' && state.answers.iron_meds === 'Да') lead += ' Вы принимаете препараты железа, а ферритин всё ещё ниже нормы — это стоит обсудить с врачом.';
   const fatigue = !sc.old && id === 'iron' && state.sym.fatigue === 'Да' ? '<p class="note" style="margin:12px var(--s-16) 0">Вы отметили усталость: она бывает при сниженных запасах железа, но у неё много причин. Расскажите о ней терапевту.</p>' : '';
   const qs = sc.old || st === 'exp' ? '' : qCard(sc, id);
-  const src = c => c.src && s.src ? `<span class="srcdoc">${DOCSVG}${s.src}</span>` : '';
+  const src = () => '';
+  const srcs = s.src && s.causes.some(c => c.src) ? [s.src] : [];
   const causes = s.causes.map(c => {
     if (!c.ifSym) return `<li><div><p class="b-xl">${c.text}</p>${src(c)}</div></li>`;
     if (sc.old) return '';
@@ -1334,6 +1346,7 @@ function vDetail(id) {
     <h2 class="t-3xl sec">Возможные причины</h2>
     ${qs}
     <div class="card"><ol class="causes">${causes}</ol></div>
+    ${srcs.length ? `<div class="srcs">${srcs.map(x => `<span class="srcdoc">${DOCSVG}${x}</span>`).join('')}</div>` : ''}
     ${more}
     <h2 class="t-3xl sec">Когда нужно к врачу</h2>
     <p class="b-xl intro">${s.docIntro}</p>
