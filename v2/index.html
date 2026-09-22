@@ -297,6 +297,19 @@
   .ind { padding: 14px 0; border-top: 1px solid var(--stroke-a4); }
   .ind:first-child { border-top: 0; padding-top: 2px; }
   .indc .ind { padding: 0; border-top: 0; }
+  /* категориальная шкала качественных анализов */
+  .cscale { display: flex; gap: 3px; height: 8px; margin: var(--s-16) 0 var(--s-6); position: relative; }
+  .cscale i { flex: 1; border-radius: 4px; background: var(--mono-100); }
+  .cscale i.n { background: #00CC8447; }
+  .cscale .m { position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 1px 4px #0302044D; transform: translateX(-50%); box-sizing: border-box; }
+  .cscale-l { display: flex; gap: 3px; font-size: 12px; line-height: 16px; color: var(--text-a56); }
+  .cscale-l span { flex: 1; text-align: center; white-space: nowrap; }
+  .val.txt { font: 600 15px/20px var(--font); white-space: nowrap; }
+  .qres { display: flex; gap: 8px; align-items: center; margin-top: 10px; font: 600 15px/20px var(--font); }
+  .qic { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; color: #fff; flex: none; }
+  .cscale.mini { height: 6px; gap: 2px; margin: 8px 0 0; }
+  .cscale.mini i { border-radius: 3px; }
+  .cscale.mini .tri { position: absolute; top: -9px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid; transform: translateX(-50%); }
   .ind-none { background: transparent; box-shadow: inset 0 0 0 1px var(--stroke-a12); }
   .ind-none .ind { opacity: .45; }
   .chip.none { background: var(--mono-700); color: #fff; }
@@ -530,7 +543,7 @@ const IND = {
   crp:     { name: 'С-реактивный белок', unit: 'мг/л', buy: 'crp' },
   albumin: { name: 'Альбумин', unit: 'г/л', buy: 'albumin' },
   protein_total: { name: 'Общий белок', unit: 'г/л', buy: 'protein_total' },
-  fecal_blood: { name: 'Кал на скрытую кровь', short: 'Скрытая кровь', unit: '', buy: 'fecal_blood' },
+  fecal_blood: { name: 'Кал на скрытую кровь', short: 'Скрытая кровь', unit: '', kind: 'bin', buy: 'fecal_blood' },
   celiac:  { name: 'Антитела к целиакии', short: 'Целиакия', unit: '', buy: 'celiac' },
   urine:   { name: 'Общий анализ мочи', short: 'Анализ мочи', unit: '', buy: 'urine' },
   glucose: { name: 'Глюкоза', unit: 'ммоль/л', buy: 'glucose' },
@@ -557,7 +570,13 @@ function cbcMale(clean) {
   ];
 }
 // Статус строго по норме: вне нормы — low/high; внутри нормы в пределах 5 % ширины нормы от края — edge (side lo/hi) ⚠️ порог на медредакцию
+// Качественные показатели: kind 'bin' — два исхода, 'lvl' — уровни; norm — сколько первых ячеек считаются нормой
+// kind 'txt' — те же два исхода, но без шкалы: результат словами с иконкой, норма подписью
+const QUAL = { bin: ['не обнаружено', 'обнаружено'], lvl: ['отриц.', 'следы', '+', '++', '+++'], txt: ['не обнаружено', 'обнаружено'] };
+const qualOf = code => { const d = IND[code]; return d && d.kind ? { kind: d.kind, cells: d.cells || QUAL[d.kind], norm: d.norm || 1 } : null; };
 function calcStatus(i) {
+  const q = qualOf(i.code);
+  if (q) { const k = typeof i.value === 'number' ? i.value : q.cells.indexOf(i.value); i.k = k; i.side = null; i.status = k < q.norm ? 'ok' : 'high'; return i; }
   const [lo, hi] = i.ref, v = i.value, tol = (hi - lo) * 0.05;
   i.side = null;
   if (v < lo) i.status = 'low'; else if (v > hi) i.status = 'high';
@@ -705,6 +724,8 @@ const labOf = () => state.lab || S().lab;
 const dateOf = () => state.date || S().date;
 // Чип статуса показателя: низкий / высокий — красные; низ / верх нормы — серые
 function chip(i) {
+  const q = qualOf(i.code);
+  if (q && i.status !== 'ok') return `<span class="chip off">${q.kind === 'lvl' ? 'выше нормы' : 'обнаружено'}</span>`;
   const m = { low: ['off', 'низкий'], high: ['off', 'высокий'], edge: ['edge', i.side === 'hi' ? 'верх нормы' : 'низ нормы'], ok: ['ok', 'в норме'] }[i.status];
   return `<span class="chip ${m[0]}">${m[1]}</span>`;
 }
@@ -868,6 +889,9 @@ function themeCTA(id, sc) {
 }
 // Мини-шкала в строке показателя на сводке: та же шкала, что на странице темы, без подписей
 function miniScale(i) {
+  const q = qualOf(i.code);
+  if (q && q.kind === 'txt') return `<p class="b-m" style="text-align:right;color:var(${i.status === 'ok' ? '--success' : '--negative'});font-weight:600">${q.cells[i.k]}</p>`;
+  if (q) return `<div class="cscale mini" aria-hidden="true">${q.cells.map((_, j) => `<i class="${j < q.norm ? 'n' : ''}"></i>`).join('')}<span class="tri" style="left:${(i.k + .5) / q.cells.length * 100}%;border-top-color:${i.status === 'ok' ? 'var(--success)' : 'var(--negative)'}"></span></div>`;
   // значение отмечает треугольник сверху: точка закрывала, где именно значение относительно нормы
   const col = isOff(i.status) ? 'var(--negative)' : i.status === 'ok' ? 'var(--success)' : 'var(--mono-700)';
   return `<div class="scale mini" aria-hidden="true"><span class="z"></span><span class="tri" style="left:${scalePos(i.value, i.ref)}%;border-top-color:${col}"></span></div>`;
@@ -1123,7 +1147,8 @@ function checkQCard() {
 function vCheck() {
   const sc = S(); const isA = ent() === 'A';
   const off = sc.ind.filter(i => isOff(i.status)).concat(sc.ind.filter(i => i.status === 'edge')); const ok = sc.ind.filter(i => i.status === 'ok');
-  const cell = i => `<div class="cell"><div><p class="b-l">${IND[i.code].name}${i.status !== 'ok' ? chip(i) : ''}</p><p class="b-m muted num">норма ${fv(i.ref[0])}–${fv(i.ref[1])}</p></div>
+  const cell = i => qualOf(i.code) ? `<div class="cell"><div><p class="b-l">${IND[i.code].name}${i.status !== 'ok' ? chip(i) : ''}</p><p class="b-m muted">норма: ${qualOf(i.code).cells.slice(0, qualOf(i.code).norm).join(', ')}</p></div>
+      <div class="val"><span class="fbox"><b style="font-size:13px">${qualOf(i.code).cells[i.k]}</b></span></div></div>` : `<div class="cell"><div><p class="b-l">${IND[i.code].name}${i.status !== 'ok' ? chip(i) : ''}</p><p class="b-m muted num">норма ${fv(i.ref[0])}–${fv(i.ref[1])}</p></div>
       <div class="val num"><span class="fbox">${isA ? `<input data-val="${i.code}" value="${fv(i.value)}" aria-label="${esc(IND[i.code].name)}" inputmode="decimal">` : `<b>${fv(i.value)}</b>`}<span class="u">${IND[i.code].unit}</span></span></div></div>`;
   const qs = !sc.old ? `<div style="margin-top:var(--s-24)">${checkQCard()}</div>` : '';
   return `${appBar('Проверка')}
@@ -1275,7 +1300,22 @@ function normList(sc) {
 }
 
 // Строка показателя на странице темы: название, чип, значение, шкала
+// Категориальная шкала: ячейки вместо полосы, первые norm ячеек — зелёная норма, точка — результат (k = null — не сдан)
+function catScale(q, k, st) {
+  const mk = k == null ? '' : `<span class="m ${st === 'ok' ? 'bg-ok' : 'bg-off'}" style="left:${(k + .5) / q.cells.length * 100}%"></span>`;
+  return `<div class="cscale">${q.cells.map((_, j) => `<i class="${j < q.norm ? 'n' : ''}"></i>`).join('')}${mk}</div>
+    <div class="cscale-l">${q.cells.map(c => `<span>${c}</span>`).join('')}</div>`;
+}
+// Результат словами: иконка и слово, под ним норма (k = null — не сдан, только норма)
+function qualText(q, k, st) {
+  const ok = st === 'ok', ic = ok ? '<path d="M5 12.5l4.5 4.5L19 7.5"/>' : '<path d="M12 7v6M12 17h.01"/>';
+  const res = k == null ? '' : `<div class="qres"><span class="qic" style="background:var(${ok ? '--success' : '--negative'})"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></span>${q.cells[k][0].toUpperCase() + q.cells[k].slice(1)}</div>`;
+  return `${res}<p class="b-m muted" style="margin-top:6px">норма: ${q.cells.slice(0, q.norm).join(', ')}</p>`;
+}
 function indRow(i) {
+  const q = qualOf(i.code);
+  if (q && q.kind === 'txt') return `<div class="ind"><div class="row"><p class="t-l">${IND[i.code].short || IND[i.code].name}${chip(i)}</p></div>${qualText(q, i.k, i.status)}</div>`;
+  if (q) return `<div class="ind"><div class="row"><p class="t-l">${IND[i.code].short || IND[i.code].name}${chip(i)}</p><p class="val txt">${q.cells[i.k]}</p></div>${catScale(q, i.k, i.status)}</div>`;
   return `<div class="ind"><div class="row"><p class="t-l">${IND[i.code].short || IND[i.code].name}${chip(i)}</p><p class="val num">${fv(i.value)}<small>${IND[i.code].unit}</small></p></div>${scaleHTML(i, i.status)}</div>`;
 }
 // Недостающий показатель: погасшая карточка — только зона нормы, без значения и отметки
@@ -1284,10 +1324,12 @@ const MISS_REF = {
   crp: { ref: [0, 5], unit: 'мг/л' },
   celiac: { ref: [0, 10], unit: 'Ед/мл' },
   urine: { ref: [0, 0.14], unit: 'г/л', label: 'белок' },
-  fecal_blood: { text: 'норма: не обнаружено' },
+  fecal_blood: { kind: 'bin' },
 };
 function missRow(buy) {
-  const n = IND[buy] ? (IND[buy].short || IND[buy].name) : CATALOG[buy].name, r = MISS_REF[buy] || {};
+  const n = IND[buy] ? (IND[buy].short || IND[buy].name) : CATALOG[buy].name, r = MISS_REF[buy] || {}, q = qualOf(buy);
+  if (q && q.kind === 'txt') return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p></div>${qualText(q, null)}</div>`;
+  if (q) return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p><p class="val num">—</p></div>${catScale(q, null)}</div>`;
   const lab = r.ref ? `<div class="scale-l num"><span style="left:25%">${fv(r.ref[0])}</span><span style="left:75%">${fv(r.ref[1])}</span></div>`
     : `<div class="scale-l"><span style="left:50%">${r.text || ''}</span></div>`;
   return `<div class="ind"><div class="row"><p class="t-l">${n}${r.label ? ' (' + r.label + ')' : ''}<span class="chip none">не сдан</span></p><p class="val num">—<small>${r.unit || ''}</small></p></div><div class="scale"><span class="z"></span></div>${lab}</div>`;
