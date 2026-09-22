@@ -659,7 +659,7 @@ const SYSTEMS = {
     lead: 'Альбумин — главный белок крови, его делает печень. Небольшое снижение часто бывает временным: после простуды или воспаления, из-за особенностей забора. Общий белок в норме, у нижнего края.',
     src: 'Клинические рекомендации «Белково-энергетическая недостаточность»',
     causes: [
-      { text: 'Недавняя простуда или воспаление: альбумин снижается на несколько недель.' },
+      { key: 'cold', text: 'Недавняя простуда или воспаление: альбумин снижается на несколько недель.' },
       { text: 'Разброс измерения и забора: положение тела, долго наложенный жгут.' },
       { ifSym: 'diet', text: 'Вы отметили диету или мало белковой еды: это может сказываться на белке, но обычно не так быстро.', src: true },
       { text: 'Белок теряется через почки: это проверяют по анализу мочи.', src: true },
@@ -685,7 +685,7 @@ const SYSTEMS = {
     lead: 'В бланке доля нейтрофилов чуть ниже нормы, а лимфоцитов чуть выше, но количество этих клеток в норме. Так бывает после простуды и у здоровых людей.',
     leadExp: 'Вы отметили недавнюю простуду: после неё доли нейтрофилов и лимфоцитов 2–4 недели бывают сдвинуты, количество клеток при этом в норме. Это ожидаемо.',
     causes: [
-      { text: 'Недавняя вирусная инфекция, в том числе перенесённая без температуры: соотношение меняется на 2–4 недели.' },
+      { key: 'cold', text: 'Недавняя вирусная инфекция, в том числе перенесённая без температуры: соотношение меняется на 2–4 недели.' },
       { text: 'Индивидуальная норма: у части здоровых людей соотношение постоянно у границы.' },
       { ifSym: 'colds', text: 'Частые или затяжные простуды — повод обсудить с терапевтом, нужны ли дополнительные анализы.' },
     ],
@@ -805,7 +805,6 @@ function sysWord(sc, id) {
 }
 function sysStatus(sc, id) {
   const s = SYSTEMS[id];
-  if (!sc.old && s.expectedIf && state.answers[s.expectedIf] === 'Да') return 'exp';
   return s.codes.some(c => isOff(indOf(sc, c).status)) ? 'off' : 'edge';
 }
 function statusWord(st, old) {
@@ -1246,14 +1245,14 @@ function vCheck() {
 
 function vSummary() {
   const sc = S(); const c = counts(sc);
-  const infection = state.answers.infection === 'Да';
+  const infection = false;
   const person = `мужчина, ${plural(sc.person.age, 'год', 'года', 'лет')}`;
   let big, line;
   if (sc.old) { big = sc.bigOld; line = countsLine(c, true); }
   else if (!c.below && !c.edge) { big = 'Отклонений нет'; line = `Все ${plural(c.total, 'показатель', 'показателя', 'показателей')} в норме. Ниже то, что дополнит картину.`; }
   else { big = 'Ваш разбор'; line = countsLine(c, false); }
   const meta = `${dateOf()} · ${labOf()} · ${person}`;
-  const control = state.answers.why === 'Назначил врач' ? `<p class="note" style="margin-top:var(--s-12)">Анализы назначил врач: покажите результат ему, он знает, зачем их назначил. Ниже пояснения, чтобы было проще разобраться.</p>` : state.answers.why === 'Контроль лечения' ? `<p class="note" style="margin-top:var(--s-12)">Вы отметили контроль лечения: разбор не заменяет оценку лечащего врача, покажите ему результат.</p>` : '';
+  const control = '';
   const hasSys = sc.systems.length > 0;
   return `${appBar('Расшифровка')}
     <h1 class="t-4xl" style="margin:12px var(--s-16) 0">${sc.lead ? 'Главное' : big}</h1>
@@ -1364,7 +1363,7 @@ function actGenetics() {
     cta: `<button class="btn" data-stub="gen">Собрать пакет</button>`, stubKey: 'gen', stubText: 'Заглушка: переход на страницу пакета Lab4 Genetics.' });
 }
 function actMetsora() {
-  if (state.answers.iron_meds !== 'Да') return '';
+  return '';
   return actCard({ ic: icon('pill'), kind: 'Приём препаратов', title: 'Отмечать приём железа в Metsora',
     lead: 'Вы принимаете препараты. Трекер напомнит о приёме, покажет врачу, как шёл курс, и сравнит следующий ферритин с сегодняшним.',
     meta: 'Metsora · бесплатно · вход через Lab4U ID · для демо',
@@ -1431,7 +1430,6 @@ function vDetail(id) {
   const sc = S(), s = SYSTEMS[id], st = sysStatus(sc, id), past = sc.past && sc.past[id];
   const shown = [...s.codes, ...s.context].map(c => indOf(sc, c)).filter(Boolean);
   let lead = past ? past.meaning : st === 'exp' ? s.leadExp : s.lead;
-  if (!sc.old && id === 'iron' && state.answers.iron_meds === 'Да') lead += ' Вы принимаете препараты железа, а ферритин всё ещё ниже нормы — это стоит обсудить с врачом.';
   const fatigue = '';
   const qs = sc.old || st === 'exp' ? '' : qCard(sc, id);
   const src = () => '';
@@ -1442,6 +1440,7 @@ function vDetail(id) {
     Object.keys(QUESTIONS).forEach(qid => { const q = QUESTIONS[qid], a = state.sym[qid]; if (q.sys !== id) return;
       if (a === 'Да' && q.up === c.key) Object.assign(e, { r: 1, tag: q.upTag }); if (a === 'Нет' && q.down === c.key) Object.assign(e, { r: -1, note: q.downNote }); });
     if (c.key === 'don' && state.answers.donor === 'Да') Object.assign(e, { r: 1, tag: 'Вы сдавали кровь как донор' });
+    if (c.key === 'cold' && state.answers.infection === 'Да') Object.assign(e, { r: 1, tag: 'Вы отметили недавнюю простуду' });
     if (c.key === 'don' && state.answers.donor === 'Нет') Object.assign(e, { r: -1, note: 'Вы не сдавали кровь как донор — не причина' });
     return e;
   };
