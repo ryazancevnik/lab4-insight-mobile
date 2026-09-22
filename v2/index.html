@@ -354,10 +354,12 @@
   .qcard + .card, .qcard + .act { margin-top: var(--s-12); }
   .ck-more { padding: var(--s-20) var(--s-16) var(--s-16); }
   .cells:has(.ck-more) { padding-bottom: 0 !important; }
-  .ordc { display: grid; grid-template-columns: minmax(0, 1fr) 20px; gap: var(--s-12); align-items: center; width: 100%; text-align: left; }
-  .ordc-b { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ordc { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; }
   .ordc + h2.sec { margin-top: var(--s-24); }
-  .chip.new { background: var(--brand-base); }
+  .oc-top { display: flex; justify-content: space-between; align-items: center; gap: var(--s-12); }
+  .oc-name { margin-top: 2px; }
+  .opill { flex: none; font-size: 14px; line-height: 20px; font-weight: 500; padding: 4px 12px; border-radius: 999px; background: var(--brand-bg); color: var(--brand-base); }
+  .opill.old { background: var(--wrapper-a6); color: var(--text-a56); }
   .ordc + .ordc { margin-top: var(--s-8); }
   .note2 { font-size: 10px; background: var(--bg-base); border-radius: 6px; padding: 1px 6px; color: var(--text-a56); margin-left: 6px; }
   /* общий прогресс чтения бланка: одна анимация на всё время, при перерисовке продолжается с того же места */
@@ -735,9 +737,9 @@ const SCENARIOS = {
     entry: 'B', old: false, person: { sex: 'м', age: 34 }, date: '21 августа', lab: 'сдача в Lab4U',
     ind: toInd(cbcMale(true)), history: [{ code: 'ferritin', value: 64, ref: [30, 400], date: '2 июля 2026' }], systems: [],
     orders: [
-      { id: 'o1', date: '21 августа 2026', name: 'Общий анализ крови, ферритин, альбумин', n: 23, note: '4 вне нормы', badge: 'новый', go: 1 },
-      { id: 'o2', date: '2 июля 2026', name: 'Общий анализ крови с лейкоцитарной формулой', n: 20, note: 'всё в норме', go: 2 },
-      { id: 'o3', date: '9 декабря 2025', name: 'Липидный профиль, глюкоза', n: 7, old: true },
+      { id: 'o1', num: '9777031245', res: '21.08.2026', date: '21 августа 2026', name: 'Общий анализ крови, ферритин, альбумин', n: 23, note: '4 вне нормы', badge: 'Новый', go: 1 },
+      { id: 'o2', num: '9777027710', res: '02.07.2026', date: '2 июля 2026', name: 'Общий анализ крови с лейкоцитарной формулой', n: 20, note: 'всё в норме', go: 2 },
+      { id: 'o3', num: '9777019432', res: '09.12.2025', date: '9 декабря 2025', name: 'Липидный профиль, глюкоза', n: 7, old: true },
     ],
     summary: 'Все 20 показателей в норме, ферритин из истории тоже. Отдельно ничего делать не нужно — ниже то, что обычно проверяют раз в год.',
     doctorQs: [],
@@ -1180,17 +1182,18 @@ function vUpload() {
 
 function vOrders() {
   const sc = SCENARIOS[2];
-  // карточки сдач в стиле карточек тем: дата и чип, название, состав; без точек-разделителей
+  // карточки как заказы в личном кабинете Lab4U, сокращённые: номер и статус, состав, дата результатов и число показателей; нажимается вся карточка
+  // ⚠️ номера заказов условные
+  const pill = o => o.badge ? `<span class="opill">${o.badge}</span>` : o.old ? '<span class="opill old">Старше 3 месяцев</span>' : '';
   return `${appBar('Расшифровка')}
     ${headHTML('tubes', 'Какие анализы разобрать?', 'Ваши результаты в Lab4U')}
-    <div style="margin-top:var(--s-24)">${sc.orders.map(o => `<button class="card tap ordc" data-order="${o.id}"><span class="ordc-b">
-        <span class="b-l muted num">${o.date}${o.badge ? `<span class="chip new">${o.badge}</span>` : ''}${o.old ? '<span class="chip edge">старше 3 месяцев</span>' : ''}</span>
-        <span class="t-xl">${o.name}</span>
-        <span class="b-l muted">${plural(o.n, 'показатель', 'показателя', 'показателей')}${o.note ? ', ' + o.note : ''}</span>
-        ${state.stub['order' + o.id] ? '<span class="stub" style="display:block;margin-top:6px">Заглушка: разбор старой сдачи в прототипе пока не собран.</span>' : ''}</span>
-      <span class="muted">${icon('chev', 18)}</span></button>`).join('')}
+    <div style="margin-top:var(--s-24)">${sc.orders.map(o => `<button class="card tap ordc" data-order="${o.id}">
+        <span class="oc-top"><span class="t-xl">Заказ ${o.num}</span>${pill(o)}</span>
+        <span class="b-l oc-name">${o.name}</span>
+        <span class="b-m muted num">Результаты от ${o.res}, ${plural(o.n, 'показатель', 'показателя', 'показателей')}${o.note ? ', ' + o.note : ''}</span>
+        ${state.stub['order' + o.id] ? '<span class="stub" style="display:block;margin-top:6px">Заглушка: разбор старой сдачи в прототипе пока не собран.</span>' : ''}</button>`).join('')}
       <h2 class="t-3xl sec">Или</h2>
-      <button class="card tap ordc" data-upload><span class="ordc-b"><span class="t-xl">Бланк другой лаборатории</span><span class="b-l muted">Фото или PDF</span></span><span class="muted">${icon('chev', 18)}</span></button>
+      <button class="card tap ordc" data-upload><span class="oc-top"><span class="t-xl">Бланк другой лаборатории</span><span class="link b-l">Загрузить</span></span><span class="b-m muted">Фото или PDF</span></button>
     </div>`;
 }
 
