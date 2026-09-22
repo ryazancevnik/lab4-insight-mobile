@@ -352,7 +352,7 @@
   body.fit .app { padding-bottom: 0; }
   body.gen-mode .app { padding-bottom: 0; }
   body.gen-mode .page { min-height: 0; }
-  .gen { color: #fff; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top)) 0 calc(40px + env(safe-area-inset-bottom)); box-sizing: border-box; }
+  .gen { color: #fff; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; padding: calc(40px + env(safe-area-inset-top)) 0 calc(40px + env(safe-area-inset-bottom)); box-sizing: border-box; }
   .gen .cap { font: 600 12px/16px var(--font); letter-spacing: .06em; text-transform: uppercase; opacity: .8; }
   .gen .gmid { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-top: 24px; }
   .gen .gslider { touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab; overflow: hidden; margin-left: calc(-1 * var(--s-16)); margin-right: calc(-1 * var(--s-16)); }
@@ -1036,11 +1036,11 @@ function sheetLogin() {
 
 // Факты на экране ожидания. ⚠️ 18 276 — условная цифра, 300 000+ и холестерин уточнить (ДИЗАЙН_v2, раздел 5а)
 const GEN_FACTS = [
-  ['300 000+', 'анализов уже расшифровали в Lab4U. Знаем, на что обращать внимание в ваших результатах'],
-  ['54%', 'людей с диабетом 2 типа в России не знали о нём, пока не сдали анализ. Проверка сахара раз в год помогает заметить изменения вовремя'],
-  ['1 из 4', 'взрослых думает, что о холестерине можно не беспокоиться, пока нет симптомов. А чтобы увидеть полную картину, одного общего холестерина мало: нужен липидный профиль из 4 показателей'],
-  ['18 276', 'пациентов Lab4U следят за динамикой показателей в личном кабинете'],
-  ['до 50%', 'скидка на анализы в Lab4U — выбираете анализы, записываетесь на сдачу в ближайшем пункте в удобное время и оплачиваете онлайн со скидкой'],
+  ['300 000+', 'анализов уже расшифровали в Lab4U — знаем, на что смотреть'],
+  ['54%', 'людей с диабетом 2 типа не знали о нём до анализа. Проверяйте сахар раз в год'],
+  ['1 из 4', 'взрослых не думает о холестерине без симптомов. Полную картину даёт липидный профиль'],
+  ['18 276', 'пациентов следят за динамикой анализов в личном кабинете'],
+  ['до 50%', 'скидка на анализы: выбираете, записываетесь и платите онлайн'],
 ];
 const GEN_STEPS = ['Сверяем показатели с нормами', 'Ищем связи между отклонениями', 'Подбираем, что стоит досдать', 'Собираем рекомендации'];
 const GEN_FACT_MS = 4000, GEN_MS = GEN_FACT_MS * GEN_FACTS.length;
