@@ -352,7 +352,7 @@
   .hl:first-child { border-top: 0; padding-top: 0; } .hl:last-child { padding-bottom: 0; }
   .hl-ic { color: var(--brand-base); display: grid; padding-top: 1px; }
   .th-card { display: block; width: 100%; text-align: left; overflow: hidden; }
-  .th-card + .th-card { margin-top: var(--s-12); }
+  .th-card + .th-card { margin-top: var(--s-24); }
   .th-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; }
   .th-t { font: 700 18px/24px var(--font); }
   .th-row { padding: 11px 0; border-top: 1px solid var(--stroke-a4); }
@@ -363,6 +363,12 @@
   .pl-step { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--stroke-a4); }
   .pl-step:first-child { border-top: 0; padding-top: 0; } .pl-step:last-child { padding-bottom: 0; }
   .pl-n { width: 28px; height: 28px; border-radius: 50%; background: var(--brand-bg); color: var(--brand-base); font: 700 14px/28px var(--font); text-align: center; }
+  /* страница темы в шторке */
+  .sheet.sheet-th { background: var(--bg-base); max-height: none; height: calc(100dvh - 48px); padding: 0 var(--s-16) calc(var(--s-24) + env(safe-area-inset-bottom)) !important; }
+  .th-sh-top { position: sticky; top: 0; z-index: 2; background: var(--bg-base); margin: 0 calc(-1 * var(--s-16)); padding: 0 var(--s-16); }
+  .th-sh-head { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; padding-bottom: 8px; }
+  .th-sh-head .title { text-align: center; font-size: 16px; line-height: 20px; font-weight: 600; }
+  .th-sh-body h1 { margin-top: 4px !important; }
   .ich .spin { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid var(--brand-bg); border-top-color: var(--brand-base); flex: none; box-sizing: border-box; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .ich .spin { animation-duration: 2.4s; } }
@@ -833,7 +839,7 @@ const SYS_SUMMARY = {
   immune: { level: 'watch', why: 'Похоже на след недавней вирусной инфекции: нейтрофилов чуть меньше, лимфоцитов чуть больше, а общее количество лейкоцитов в норме. Обычно это проходит само за 2–4 недели.' },
 };
 // Вариант кнопки в карточке темы: ?cta=a (серая кнопка) или ?cta=d (голубой подвал)
-const ctaVariant = () => (state.cta || new URLSearchParams(location.search).get('cta') || 'a').toLowerCase();
+const ctaVariant = () => (state.cta || new URLSearchParams(location.search).get('cta') || 'd').toLowerCase();
 function highlightsHTML(sc, infection) {
   const ic = { calm: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>', main: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>', ok: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>' };
   return `<h2 class="t-3xl sec">Главное</h2><div class="card">${sc.highlights.map(h => `<div class="hl"><span class="hl-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ic[h[0]]}</svg></span><div><p class="t-l">${h[1]}</p><p class="b-m muted" style="margin-top:2px">${h[2]}</p></div></div>`).join('')}</div>`;
@@ -842,7 +848,7 @@ function themeCTA(id, sc) {
   const s = SYSTEMS[id], nc = s.causes.filter(c => !c.ifSym).length, nm = (s.missing || []).length;
   const causes = plural(nc, 'возможная причина', 'возможные причины', 'возможных причин');
   const sub = nm ? `${causes} и ${plural(nm, 'анализ', 'анализа', 'анализов')}` : s.retest ? `${causes} и когда пересдать` : causes;
-  if (ctaVariant() === 'd') return `<div class="cta-d"><div><p class="t-l" style="color:#fff">Разобраться в причинах</p><p class="b-m" style="color:#fff;opacity:.85">${sub}</p></div><span class="cta-d-arr">${icon('chev', 18)}</span></div>`;
+  if (ctaVariant() === 'd') return `<div class="cta-d"><div><p style="color:#fff;font:600 16px/24px var(--font)">Разобраться в причинах</p><p class="b-m" style="color:#fff;opacity:.85">${sub}</p></div><span class="cta-d-arr">${icon('chev', 18)}</span></div>`;
   return `<div class="btn btn-sec cta-a"><span>${nm ? 'Причины и что досдать' : 'Причины и когда пересдать'}</span>${icon('chev', 18)}</div>`;
 }
 function themeCard(id, sc) {
@@ -869,6 +875,12 @@ function planBlock(sc) {
     <div class="pl-step"><span class="pl-n">2</span><div><p class="t-l">Показать результаты терапевту</p><p class="b-m muted" style="margin-top:2px">Один врач по всем темам. Лучше прийти уже с досданными анализами</p>
       <button class="btn btn-sec" style="margin-top:12px" data-stub="doctor">Записаться к терапевту</button>${state.stub.doctor ? '<p class="stub" style="margin-top:8px">Заглушка: переход в Медорию.</p>' : ''}</div></div>
   </div>`;
+}
+function sheetTheme() {
+  const s = SYSTEMS[state.sys], body = vDetail(state.sys).replace(appBar(s.name), '');
+  return `<div class="veil" data-close></div><div class="sheet sheet-th" role="dialog" aria-label="${s.name}">
+    <div class="th-sh-top"><div class="handle"><i></i></div><div class="th-sh-head"><span class="rbtn ghost"></span><p class="title">${s.name}</p><button class="rbtn" data-close aria-label="Закрыть">${icon('close', 18)}</button></div></div>
+    <div class="th-sh-body">${body}</div></div>`;
 }
 function sysCard(id, sc) {
   const s = SYSTEMS[id], st = sysStatus(sc, id), t = sysText(sc, id);
@@ -1334,8 +1346,11 @@ function render() {
   // выбранный таб всегда виден: если ряд ещё не прокручивали, подвинуть к выбранному
   document.querySelectorAll('.tabs').forEach(t => { const a = t.querySelector('[aria-selected="true"]'); if (a && !segX[t.dataset.seg] && a.offsetLeft + a.offsetWidth > t.clientWidth) t.scrollLeft = a.offsetLeft - 16; });
   document.getElementById('bar').innerHTML = bottomBar();
-  const sheets = { upload: sheetUpload, files: sheetFiles, login: sheetLogin, cart: sheetCart };
+  const sheets = { upload: sheetUpload, files: sheetFiles, login: sheetLogin, cart: sheetCart, theme: sheetTheme };
+  // при перерисовке открытая шторка не должна прыгать в начало
+  const keepY = state.sheet && state.sheet === lastSheet ? document.querySelector('#sheet .sheet')?.scrollTop : 0;
   document.getElementById('sheet').innerHTML = sheets[state.sheet] ? sheets[state.sheet]() : '';
+  if (keepY) document.querySelector('#sheet .sheet').scrollTop = keepY;
   if (state.sheet && state.sheet !== lastSheet) {
     document.querySelector('#sheet .sheet, #sheet .fp')?.classList.add('in');
     if (!lastSheet) document.querySelector('#sheet .veil')?.classList.add('in');
@@ -1429,7 +1444,7 @@ document.addEventListener('click', e => {
     state.stub['order' + o.id] = !state.stub['order' + o.id]; return render();
   }
   if (d.tab) { const [sid, code] = d.tab.split('|'); state.tab = { ...(state.tab || {}), [sid]: code }; return render(); }
-  if (d.sys) { state.summaryY = window.scrollY; state.sys = d.sys; state.tab = {}; return go('detail'); }
+  if (d.sys) { state.sys = d.sys; state.tab = {}; state.sheet = 'theme'; return render(); }
   if (d.q) { state.answers[d.q] = d.a; return render(); }
   if ('normck' in d) { state.checkNormOpen = !state.checkNormOpen; return render(); }
   if ('ckreset' in d) { CHECK_QS.forEach(q => { delete state.answers[q.id]; }); return render(); }
