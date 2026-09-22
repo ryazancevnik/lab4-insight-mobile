@@ -355,7 +355,10 @@
   .th-card + .th-card { margin-top: var(--s-24); }
   .th-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px; }
   .th-t { font: 700 18px/24px var(--font); }
-  .th-row { padding: 11px 0; border-top: 1px solid var(--stroke-a4); }
+  .th-row { padding: 11px 0; border-top: 1px solid var(--stroke-a4); display: grid; grid-template-columns: 1fr 88px; gap: 12px; align-items: center; }
+  .scale.mini { height: 6px; border-radius: 3px; margin: 0; }
+  .scale.mini .z { border-radius: 3px; }
+  .scale.mini .m { top: -4px; width: 14px; height: 14px; border-width: 2px; }
   .th-why { padding-top: 12px; border-top: 1px solid var(--stroke-a4); }
   .cta-a { margin-top: 14px; justify-content: space-between; padding: 12px 16px; }
   .cta-d { margin: 14px calc(-1 * var(--s-16)) calc(-1 * var(--s-16)); background: var(--brand-base); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -853,9 +856,14 @@ function themeCTA(id, sc) {
   if (ctaVariant() === 'd') return `<div class="cta-d"><div><p style="color:#fff;font:600 16px/24px var(--font)">Разобраться в причинах</p><p class="b-l" style="color:#fff;opacity:.85">${sub}</p></div><span class="cta-d-arr">${icon('chev', 18)}</span></div>`;
   return `<div class="btn btn-sec cta-a"><span>${nm ? 'Причины и что досдать' : 'Причины и когда пересдать'}</span>${icon('chev', 18)}</div>`;
 }
+// Мини-шкала в строке показателя на сводке: та же шкала, что на странице темы, без подписей
+function miniScale(i) {
+  const col = isOff(i.status) ? 'bg-off' : i.status === 'ok' ? 'bg-ok' : 'bg-edge';
+  return `<div class="scale mini" aria-hidden="true"><span class="z"></span><span class="m ${col}" style="left:${scalePos(i.value, i.ref)}%"></span></div>`;
+}
 function themeCard(id, sc) {
   const s = SYSTEMS[id], past = sc.past && sc.past[id];
-  const rows = s.codes.map(c => indOf(sc, c)).filter(Boolean).map(i => `<div class="th-row"><p class="b-xl">${IND[i.code].short || IND[i.code].name}${chip(i)}</p></div>`).join('');
+  const rows = s.codes.map(c => indOf(sc, c)).filter(Boolean).map(i => `<div class="th-row"><p class="b-xl">${IND[i.code].short || IND[i.code].name}${chip(i)}</p>${miniScale(i)}</div>`).join('');
   const why = past ? past.meaning : sysStatus(sc, id) === 'exp' ? s.expected : SYS_SUMMARY[id].why;
   return `<button class="card tap th-card" data-sys="${id}"><div class="th-head"><p class="th-t">${s.name}</p><span class="muted">${icon('chev', 18)}</span></div>
     ${rows}<p class="b-xl th-why">${why}</p>${themeCTA(id, sc)}</button>`;
