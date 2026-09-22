@@ -376,7 +376,7 @@
   /* сводка v3 */
   .hl { display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--stroke-a4); }
   .hl:first-child { border-top: 0; padding-top: 0; } .hl:last-child { padding-bottom: 0; }
-  .hl-ic { color: var(--brand-base); display: grid; padding-top: 1px; }
+  .hl-dot { width: 12px; height: 12px; border-radius: 50%; margin: 6px 0 0 4px; }
   .th-card { display: block; width: 100%; text-align: left; overflow: hidden; }
   .th-card + .th-card { margin-top: var(--s-24); }
   .th-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: var(--s-16); }
@@ -689,8 +689,9 @@ const SCENARIOS = {
     file: { name: 'Анализы_28.08.2026.pdf', size: '214 КБ', kind: 'pdf' },
     urgent: 'Срочного ничего нет',
     highlights: [
-      ['main', 'Главное — запасы железа', 'Ферритин 18 при норме от 30, гемоглобин пока в норме. У мужчин причину ищут простыми анализами и с терапевтом'],
-      ['ok', '18 из 23 показателей в норме', 'Эритроциты, тромбоциты, общее количество лейкоцитов и другие'],
+      ['red', 'Главное — запасы железа', 'Ферритин 18 при норме от 30, гемоглобин пока в норме. У мужчин причину ищут простыми анализами и с терапевтом'],
+      ['yellow', 'Белок и лейкоциты — понаблюдать', 'Альбумин немного ниже нормы, доли лейкоцитов сдвинуты. Чаще это временно, но стоит перепроверить'],
+      ['green', '18 из 23 показателей в норме', 'Эритроциты, тромбоциты, общее количество лейкоцитов и другие'],
     ],
     summary: 'Ферритин 18 при норме от 30: запасов железа меньше нормы, гемоглобин пока в норме. У мужчин в такой ситуации выясняют, куда уходит железо, — это делают простыми анализами и с терапевтом. Альбумин немного ниже нормы, доли лейкоцитов немного сдвинуты: чаще это временно.',
     summaryInfection: 'Ферритин 18 при норме от 30: запасов железа меньше нормы, гемоглобин пока в норме. У мужчин в такой ситуации выясняют, куда уходит железо, — это делают простыми анализами и с терапевтом. Альбумин немного ниже нормы, сдвиг лейкоцитов ожидаем после недавней простуды.',
@@ -883,9 +884,10 @@ const SYS_SUMMARY = {
 };
 // Вариант кнопки в карточке темы: ?cta=a (серая кнопка) или ?cta=d (голубой подвал)
 const ctaVariant = () => (state.cta || new URLSearchParams(location.search).get('cta') || 'd2').toLowerCase();
+// Пункты «Главного» светофором: red — требует внимания, yellow — понаблюдать, green — в порядке
 function highlightsHTML(sc, infection) {
-  const ic = { calm: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>', main: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>', ok: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>' };
-  return `<div class="card" style="margin-top:16px">${sc.highlights.map(h => `<div class="hl"><span class="hl-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ic[h[0]]}</svg></span><div><p class="t-xl">${h[1]}</p><p class="b-xl muted" style="margin-top:2px">${h[2]}</p></div></div>`).join('')}</div>`;
+  const col = { red: 'var(--negative)', yellow: 'var(--warning)', green: 'var(--success)' };
+  return `<div class="card" style="margin-top:16px">${sc.highlights.map(h => `<div class="hl"><span class="hl-dot" style="background:${col[h[0]]}"></span><div><p class="t-xl">${h[1]}</p><p class="b-xl muted" style="margin-top:2px">${h[2]}</p></div></div>`).join('')}</div>`;
 }
 function themeCTA(id, sc) {
   const s = SYSTEMS[id], nc = s.causes.filter(c => !c.ifSym).length, nm = (s.missing || []).length;
