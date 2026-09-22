@@ -938,14 +938,15 @@ function themeGroups(sc) {
   const attn = sc.systems.filter(id => SYS_SUMMARY[id].level === 'attn' && sysStatus(sc, id) !== 'exp');
   const watch = sc.systems.filter(id => !attn.includes(id));
   const g = (t, ids) => ids.length ? `<h2 class="t-3xl sec">${t}</h2>${ids.map(id => themeCard(id, sc)).join('')}` : '';
-  return g(sc.old ? 'Тогда требовало внимания' : 'Требует внимания', attn) + g(sc.old ? 'Тогда требовало наблюдения' : 'Требует наблюдения', watch);
+  if (sc.old) return g('Нужно пересдать', sc.systems);
+  return g('Требует внимания', attn) + g('Требует наблюдения', watch);
 }
 // План: полный список недостающих анализов одной карточкой, по темам, где мы их советуем; общий для двух тем — один раз
 function planBlock(sc) {
   const seen = {}, groups = [];
-  sc.systems.filter(id => sysStatus(sc, id) !== 'exp' && (SYSTEMS[id].missing || []).length).forEach(id => {
+  sc.systems.filter(id => sysStatus(sc, id) !== 'exp' && themeMissing(sc, id).length).forEach(id => {
     const rows = [];
-    SYSTEMS[id].missing.forEach(m => {
+    themeMissing(sc, id).forEach(m => {
       if (seen[m.buy]) { seen[m.buy].also.push(SYSTEMS[id].name.toLowerCase()); return; }
       seen[m.buy] = { ...m, also: [] }; rows.push(seen[m.buy]);
     });
@@ -959,14 +960,14 @@ function planBlock(sc) {
   const btn = !rest.length ? `<button class="btn all" data-unpick="${buys.join(',')}">${icon('check', 18)} Все добавлено</button>`
     : `<button class="btn split" data-pick="${rest.join(',')}"><span>${rest.length === buys.length ? 'Добавить все' : 'Добавить ещё ' + rest.length}</span><span class="num">${fmt(restSum)} ₽</span></button>`;
   // общий прогресс, как на странице темы: сданные показатели этих тем + выбранные из недостающих
-  const have = new Set(groups.flatMap(g => [...SYSTEMS[g.id].codes, ...SYSTEMS[g.id].context].filter(c => indOf(sc, c)))).size;
+  const have = sc.old ? 0 : new Set(groups.flatMap(g => [...SYSTEMS[g.id].codes, ...SYSTEMS[g.id].context].filter(c => indOf(sc, c)))).size;
   const total = have + buys.length, n = have + (buys.length - rest.length), pct = Math.round(n / total * 100);
   const col = n === total ? 'var(--success)' : n / total > 1 / 3 ? 'var(--warning)' : 'var(--negative)';
   return `<h2 class="t-3xl sec">Что делать дальше</h2>
-    <p class="b-xl intro">Нужно сдать недостающие анализы, которые позволят точнее установить причины отклонений.</p>
+    <p class="b-xl intro">${sc.old ? 'Бланку три с половиной года. Чтобы понять, как обстоят дела сейчас, сдайте эти анализы заново.' : 'Нужно сдать недостающие анализы, которые позволят точнее установить причины отклонений.'}</p>
     <div class="card"><div style="display:flex;justify-content:space-between"><p class="t-l">Сдано ${n} из ${total} ${total % 10 === 1 && total % 100 !== 11 ? 'анализа' : 'анализов'}</p><p class="b-m muted">${n === total ? 'картина полная' : 'не хватает ' + (total - n)}</p></div>
       <div class="covb"><i style="width:${pct}%;background:${col}"></i></div>
-      ${groups.map(g => `<div class="pl-g pl-g2"><p class="t-xl">${SYSTEMS[g.id].name}</p><p class="b-m muted">${lvl(g.id)}</p></div>${g.rows.map(row).join('')}`).join('')}
+      ${groups.map(g => `<div class="pl-g pl-g2"><p class="t-xl">${SYSTEMS[g.id].name}</p><p class="b-m muted">${sc.old ? '' : lvl(g.id)}</p></div>${g.rows.map(row).join('')}`).join('')}
       <div style="margin-top:8px">${btn}</div></div>
     <div class="card pl-doc"><img src="${DOC_PHOTO}" alt="Терапевт"><div><p class="t-xl">Показать результаты терапевту</p><p class="b-l muted" style="margin-top:2px">Один врач по всем темам. Лучше прийти с досданными анализами</p></div>
       <button class="btn btn-sec" data-stub="doctor">Записаться к терапевту</button>${state.stub.doctor ? '<p class="stub">Заглушка: переход в Медорию.</p>' : ''}</div>`;
@@ -1218,7 +1219,7 @@ function vSummary() {
     <p class="b-xl intro" style="margin-top:0">${infection && sc.summaryInfection ? sc.summaryInfection : sc.summary}</p>`}${control ? `<div style="margin:0 var(--s-16)">${control}</div>` : ''}
     ${hasSys ? themeGroups(sc) : ''}
     ${hasSys && !sc.old ? `<div style="margin-top:var(--s-24)">${qCard(sc)}</div>` : ''}
-    ${hasSys && !sc.old ? planBlock(sc) : ''}
+    ${hasSys ? planBlock(sc) : ''}
 `;
 }
 
