@@ -1201,7 +1201,6 @@ function checkQCard() {
     <div class="bars">${qs.map(q => `<i class="${state.answers[q.id] ? 'on' : ''}"></i>`).join('')}</div>
     <p class="t-2xl">${cur.q}</p>
     <div class="opts${cur.opts.length > 2 ? ' wrap' : ''}">${cur.opts.map(o => `<button class="opt" data-q="${cur.id}" data-a="${o}">${o}</button>`).join('')}</div>
-    <p class="eff">${cur.eff}</p>
   </div>`;
 }
 // Строка «Мужчина, 34 года / Сдано 28 августа»: пол и возраст из бланка или профиля, правка одним тапом
@@ -1275,7 +1274,6 @@ function qCard(sc, sysId) {
     <div class="bars">${all.map(id => `<i class="${state.sym[id] != null || state.skipped.has(id) ? 'on' : ''}"></i>`).join('')}</div>
     <p class="t-2xl">${q.text}</p>
     <div class="opts"><button class="opt" data-sym="${cur}" data-a="Да">Да</button><button class="opt" data-sym="${cur}" data-a="Нет">Нет</button></div>
-    ${q.eff ? `<p class="eff">${q.eff}</p>` : ''}
   </div>`;
 }
 
