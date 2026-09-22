@@ -304,7 +304,7 @@
   .cscale .m { position: absolute; top: -5px; width: 18px; height: 18px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 1px 4px #0302044D; transform: translateX(-50%); box-sizing: border-box; }
   .cscale-l { display: flex; gap: 3px; font-size: 12px; line-height: 16px; color: var(--text-a56); }
   .cscale-l span { flex: 1; text-align: center; white-space: nowrap; }
-  .val.txt { font: 600 15px/20px var(--font); white-space: nowrap; }
+  .ind .val.txt { font: 500 15px/20px var(--font); white-space: nowrap; }
   .qres { display: flex; gap: 8px; align-items: center; margin-top: 10px; font: 600 15px/20px var(--font); }
   .qic { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; color: #fff; flex: none; }
   .cscale.mini { height: 6px; gap: 2px; margin: 8px 0 0; }
@@ -1329,7 +1329,7 @@ const MISS_REF = {
 function missRow(buy) {
   const n = IND[buy] ? (IND[buy].short || IND[buy].name) : CATALOG[buy].name, r = MISS_REF[buy] || {}, q = qualOf(buy);
   if (q && q.kind === 'txt') return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p></div>${qualText(q, null)}</div>`;
-  if (q) return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p><p class="val num">—</p></div>${catScale(q, null)}</div>`;
+  if (q) return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p><p class="val txt">—</p></div>${catScale(q, null)}</div>`;
   const lab = r.ref ? `<div class="scale-l num"><span style="left:25%">${fv(r.ref[0])}</span><span style="left:75%">${fv(r.ref[1])}</span></div>`
     : `<div class="scale-l"><span style="left:50%">${r.text || ''}</span></div>`;
   return `<div class="ind"><div class="row"><p class="t-l">${n}${r.label ? ' (' + r.label + ')' : ''}<span class="chip none">не сдан</span></p><p class="val num">—<small>${r.unit || ''}</small></p></div><div class="scale"><span class="z"></span></div>${lab}</div>`;
