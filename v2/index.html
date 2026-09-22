@@ -314,10 +314,8 @@
   .cscale.mini { height: 6px; gap: 2px; margin: 8px 0 0; }
   .cscale.mini i { border-radius: 3px; }
   .cscale.mini .tri { position: absolute; top: -9px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid; transform: translateX(-50%); }
-  .ind-none { background: transparent; box-shadow: inset 0 0 0 1px var(--stroke-a4); }
-  .ind-none.fill { background: var(--surface-base); box-shadow: none; opacity: .5; }
-  .ind-none.fill .ind { opacity: 1; }
-  .ind-none .ind { opacity: .45; }
+  /* несданный анализ: белая карточка, вся полупрозрачная */
+  .ind-none { background: var(--surface-base); box-shadow: none; opacity: .5; }
   .chip.none { background: var(--mono-700); color: #fff; }
   .btn.all { background: var(--success); color: #fff; box-shadow: none; }
   .ind .row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
@@ -1395,7 +1393,7 @@ function vDetail(id) {
     <p class="b-l muted" style="margin:6px var(--s-16) 0">${dateOf()} · ${plural(shown.length, 'показатель', 'показателя', 'показателей')}</p>
     <p class="b-xl" style="margin:12px var(--s-16) 0">${lead}</p>${fatigue}
     <h2 class="t-3xl sec">Из чего делают выводы</h2>
-    <div>${shown.map(i => `<div class="card indc">${indRow(i)}</div>`).join('')}${(s.missing || []).map((m, k) => `<div class="card indc ind-none${k % 2 ? ' fill' : ''}">${missRow(m.buy)}</div>`).join('')}</div>
+    <div>${shown.map(i => `<div class="card indc">${indRow(i)}</div>`).join('')}${(s.missing || []).map(m => `<div class="card indc ind-none">${missRow(m.buy)}</div>`).join('')}</div>
     <h2 class="t-3xl sec">Возможные причины</h2>
     ${qs}
     <div class="card"><ol class="causes">${causes}</ol></div>
