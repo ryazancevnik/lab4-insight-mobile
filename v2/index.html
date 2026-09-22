@@ -1332,10 +1332,10 @@ const MISS_REF = {
 function missRow(buy) {
   const n = IND[buy] ? (IND[buy].short || IND[buy].name) : CATALOG[buy].name, r = MISS_REF[buy] || {}, q = qualOf(buy);
   if (q && q.kind === 'txt') return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p></div>${qualText(q, null)}</div>`;
-  if (q) return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p><p class="val txt">—</p></div>${catScale(q, null)}</div>`;
+  if (q) return `<div class="ind"><div class="row"><p class="t-l">${n}<span class="chip none">не сдан</span></p></div>${catScale(q, null)}</div>`;
   const lab = r.ref ? `<div class="scale-l num"><span style="left:25%">${fv(r.ref[0])}</span><span style="left:75%">${fv(r.ref[1])}</span></div>`
     : `<div class="scale-l"><span style="left:50%">${r.text || ''}</span></div>`;
-  return `<div class="ind"><div class="row"><p class="t-l">${n}${r.label ? ' (' + r.label + ')' : ''}<span class="chip none">не сдан</span></p><p class="val num">—<small>${r.unit || ''}</small></p></div><div class="scale"><span class="z"></span></div>${lab}</div>`;
+  return `<div class="ind"><div class="row"><p class="t-l">${n}${r.label ? ' (' + r.label + ')' : ''}<span class="chip none">не сдан</span></p></div><div class="scale"><span class="z"></span></div>${lab}</div>`;
 }
 const DOCSVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>';
 function themeMissing(sc, id) {
