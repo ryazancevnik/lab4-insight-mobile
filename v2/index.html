@@ -1205,7 +1205,7 @@ function checkQCard() {
   if (!cur) return `<div class="card qdone"><span class="ic" style="background:var(--success);color:#fff">${icon('check')}</span><div style="flex:1"><p class="t-xl">Ответы учтены</p><p class="b-l muted">Разбор учтёт их при чтении показателей</p></div><button class="link b-l" data-ckreset>Изменить</button></div>`;
   const k = qs.indexOf(cur) + 1, n = qs.length;
   return `<div class="qcard">
-    <div class="top"><span class="caps">Вопросы о сдаче</span><span class="b-m muted num">${k} из ${n}</span></div>
+    <div class="top"><span class="caps">Вопросы для уточнения</span><span class="b-m muted num">${k} из ${n}</span></div>
     <div class="bars">${qs.map(q => `<i class="${state.answers[q.id] ? 'on' : ''}"></i>`).join('')}</div>
     <p class="t-2xl">${cur.q}</p>
     <div class="opts${cur.opts.length > 2 ? ' wrap' : ''}">${cur.opts.map(o => `<button class="opt" data-q="${cur.id}" data-a="${o}">${o}</button>`).join('')}</div>
@@ -1224,7 +1224,7 @@ function sheetWho() {
     <div class="fld"><span class="b-xl">Пол</span><span class="sgm"><button class="${sex === 'м' ? 'on' : ''}" data-wsex="м">Мужской</button><button class="${sex === 'ж' ? 'on' : ''}" data-wsex="ж">Женский</button></span></div>
     <div class="fld"><span class="b-xl">Дата рождения</span><input class="fin num" value="${dob}" inputmode="numeric" aria-label="Дата рождения"></div>
     <div class="fld"><span class="b-xl">Дата сдачи</span><input class="fin num" value="${taken}" inputmode="numeric" aria-label="Дата сдачи"></div>
-    ${sex === 'ж' ? '<p class="stub" style="margin-top:12px">Заглушка: для женщины 18–50 лет в вопросах о сдаче первым появится вопрос о беременности, нормы пересчитаются по полу.</p>' : ''}
+    ${sex === 'ж' ? '<p class="stub" style="margin-top:12px">Заглушка: для женщины 18–50 лет в вопросах для уточнения первым появится вопрос о беременности, нормы пересчитаются по полу.</p>' : ''}
     <button class="btn" data-close style="margin-top:16px">Готово</button></div>`;
 }
 function vCheck() {
@@ -1499,7 +1499,7 @@ function bottomBar() {
   if (state.screen === 'start') return `<div class="bar"><button class="btn" data-upload>Загрузить бланк</button><button class="btn btn-sec" data-mine>Мои анализы в Lab4U</button><p class="fine">Не заменяет консультацию врача · для взрослых 18+</p></div>`;
   if (state.screen === 'check') {
     const left = S().old ? 0 : ckQs().filter(q => !state.answers[q.id]).length;
-    return `<div class="bar"><button class="btn" data-confirm${left ? ' disabled' : ''}>Верно, получить разбор</button>${left ? `<p class="fine">Ответьте на вопросы о сдаче, ${left === 1 ? 'остался 1' : 'осталось ' + left}</p>` : ''}</div>`;
+    return `<div class="bar"><button class="btn" data-confirm${left ? ' disabled' : ''}>Верно, получить разбор</button>${left ? `<p class="fine">Ответьте на вопросы выше, всего ${left} ${left === 1 ? 'остался' : 'осталось'}</p>` : ''}</div>`;
   }
   if ((state.screen === 'summary' || state.screen === 'detail') && state.picked.size) {
     const n = state.picked.size;
