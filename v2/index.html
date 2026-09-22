@@ -78,7 +78,7 @@
   .appbar { position: sticky; top: 0; z-index: 5; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; padding: var(--s-8) 0; margin: 0 calc(-1 * var(--s-16)); padding-left: var(--s-16); padding-right: var(--s-16); background: #F1F2F4E6; -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); }
   .appbar .title { text-align: center; font-size: 16px; line-height: 20px; font-weight: 600; }
   .rbtn { width: 40px; height: 40px; border-radius: 50%; background: var(--surface-base); box-shadow: 0 2px 8px #03020414; display: grid; place-items: center; color: var(--text-a100); }
-  .rbtn:hover { opacity: .8; } .rbtn:active { opacity: .7; }
+  @media (hover: hover) { .rbtn:hover { opacity: .8; } } .rbtn:active { opacity: .7; }
   .rbtn.ghost { visibility: hidden; }
 
   /* карточки */
@@ -112,15 +112,15 @@
 
   /* кнопки: buttonAccent LG, состояния прозрачностью 100/80/70/35 */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-8); min-height: 48px; padding: 12px 16px; border-radius: var(--r-12); font-size: 16px; line-height: 24px; font-weight: 600; background: var(--brand-base); color: var(--text-white); width: 100%; text-align: center; }
-  .btn:hover { opacity: .8; } .btn:active { opacity: .7; } .btn:disabled { opacity: .35; cursor: not-allowed; }
+  @media (hover: hover) { .btn:hover { opacity: .8; } } .btn:active { opacity: .7; } .btn:disabled { opacity: .35; cursor: not-allowed; }
   .btn.on { background: var(--brand-bg); color: var(--brand-base); box-shadow: inset 0 0 0 1.5px var(--brand-base); }
   .btn.on:hover { opacity: 1; }
   .btn-sec { background: var(--wrapper-a6); color: var(--text-a100); }
   .btn-sm { min-height: 40px; padding: 10px 16px; border-radius: var(--r-8); font-size: 14px; line-height: 20px; width: auto; }
   .link { color: var(--brand-base); font-weight: 500; }
-  .link:hover { opacity: .8; }
+  @media (hover: hover) { .link:hover { opacity: .8; } }
   .opt { flex: 1; min-height: 48px; border-radius: var(--r-12); background: var(--wrapper-a6); font-weight: 600; font-size: 16px; }
-  .opt:hover { opacity: .8; } .opt:active { opacity: .7; }
+  @media (hover: hover) { .opt:hover { opacity: .8; } } .opt:active { opacity: .7; }
   .opt[aria-pressed="true"] { background: var(--brand-base); color: var(--text-white); }
   .opts { display: flex; gap: var(--s-8); margin-top: var(--s-12); }
   .opts.wrap { flex-wrap: wrap; } .opts.wrap .opt { flex: 1 1 auto; padding: 0 var(--s-16); min-height: 40px; border-radius: var(--r-8); font-size: 14px; }
@@ -160,7 +160,7 @@
   .sg .cb { width: 16px; height: 16px; border-radius: var(--r-4); border: 1px solid var(--stroke-a12); background: var(--surface-base); display: inline-grid; place-content: center; margin-bottom: 2px; flex: none; }
   .sg .cb.done { background: #fff; border: 1.5px solid var(--cb); }
   .sg .cb.done::after, .sg.on .cb::after { content: ""; width: 8px; height: 5px; border: 2px solid var(--cb, var(--brand-base)); border-top: 0; border-right: 0; transform: translateY(-1px) rotate(-45deg); }
-  .sg.pick { cursor: pointer; } .sg.pick:hover { box-shadow: inset 0 0 0 1px var(--brand-base); }
+  .sg.pick { cursor: pointer; } @media (hover: hover) { .sg.pick:hover { box-shadow: inset 0 0 0 1px var(--brand-base); } }
   .sg.pick:focus-within { outline: 2px solid var(--brand-base); outline-offset: 2px; }
   .sg.on { background: var(--brand-base); color: var(--text-white); box-shadow: none; --cb: var(--brand-base); }
   .sg.on .cb { background: #fff; border-color: #fff; }
@@ -356,6 +356,7 @@
   .cells:has(.ck-more) { padding-bottom: 0 !important; }
   .ordc { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; }
   .ordc + h2.sec { margin-top: var(--s-24); }
+  .bar button.fine { display: block; width: 100%; }
   body.nobar .app { padding-bottom: calc(var(--s-24) + env(safe-area-inset-bottom)); }
   .oc-top { display: flex; justify-content: space-between; align-items: center; gap: var(--s-12); }
   .oc-name { margin-top: 2px; }
@@ -443,14 +444,19 @@
   .trust { display: flex; gap: 8px; flex-wrap: wrap; }
   .trust span { display: inline-flex; gap: 6px; align-items: center; font: 500 14px/18px var(--font); color: var(--text-a56); background: #fff; border-radius: 999px; padding: 7px 12px; }
   .trust svg { color: var(--brand-base); }
-  .lnd-ill { position: relative; height: 236px; margin: 22px var(--s-16) 0; max-width: 360px; }
-  .lnd-sheet { position: absolute; left: 6px; top: 20px; width: 130px; height: 176px; border-radius: 14px; background: #fff; transform: rotate(-6deg); box-shadow: 0 6px 20px #30393A14; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; }
-  .lnd-sheet span { height: 5px; border-radius: 3px; background: var(--mono-150); }
-  .lnd-card { position: absolute; right: 4px; top: 38px; width: 222px; border-radius: 16px; background: #fff; box-shadow: 0 10px 30px #30393A1F; padding: 6px 12px; }
-  .lnd-row { display: flex; justify-content: space-between; align-items: center; height: 32px; }
-  .lnd-row .chip { margin-left: 0; }
-  .lnd-ln { display: flex; gap: 6px; align-items: center; height: 26px; border-top: 1px solid var(--stroke-a4); }
+  /* иллюстрация масштабируется целиком: макет 311×236 (ширина на 375), все размеры в долях ширины контейнера (--u = 1 px макета) */
+  .lnd-ill { margin: 22px auto 0; width: calc(100% - 32px); max-width: 400px; container-type: inline-size; }
+  .lnd-stage { --u: calc(100cqw / 311); position: relative; height: calc(var(--u) * 236); }
+  .lnd-sheet { position: absolute; left: calc(var(--u) * 6); top: calc(var(--u) * 20); width: calc(var(--u) * 130); height: calc(var(--u) * 176); border-radius: calc(var(--u) * 14); background: #fff; transform: rotate(-6deg); box-shadow: 0 6px 20px #30393A14; padding: calc(var(--u) * 16) calc(var(--u) * 12); display: flex; flex-direction: column; gap: calc(var(--u) * 10); }
+  .lnd-sheet span { height: calc(var(--u) * 5); border-radius: calc(var(--u) * 3); background: var(--mono-150); }
+  .lnd-card { position: absolute; right: calc(var(--u) * 4); top: calc(var(--u) * 38); width: calc(var(--u) * 222); border-radius: calc(var(--u) * 16); background: #fff; box-shadow: 0 10px 30px #30393A1F; padding: calc(var(--u) * 6) calc(var(--u) * 12); }
+  .lnd-row { display: flex; justify-content: space-between; align-items: center; height: calc(var(--u) * 32); }
+  .lnd-row .t-l { font-size: calc(var(--u) * 14); line-height: calc(var(--u) * 20); }
+  .lnd-row .chip { margin-left: 0; font-size: calc(var(--u) * 12); line-height: calc(var(--u) * 16); padding: calc(var(--u) * 2) calc(var(--u) * 8); }
+  .lnd-ln { display: flex; gap: calc(var(--u) * 6); align-items: center; height: calc(var(--u) * 26); border-top: 1px solid var(--stroke-a4); }
+  .lnd-ln .b-m { font-size: calc(var(--u) * 12); line-height: calc(var(--u) * 16); white-space: nowrap; }
   .lnd-ln > span:first-child { color: var(--brand-base); display: grid; }
+  .lnd-ln svg { width: calc(var(--u) * 16); height: calc(var(--u) * 16); }
   .bar .fine { font-size: 11px; line-height: 14px; color: var(--text-a56); text-align: center; margin-top: 2px; }
   /* вход — копия формы сайта lab4u.ru */
   .au { font-family: Roboto, Arial, sans-serif; color: #2B2F38; display: flex; flex-direction: column; }
@@ -1039,13 +1045,13 @@ function vStart() {
       <h1 class="lnd-h1">Поймите, что показывают ваши анализы</h1>
       <div class="trust">${tr('gift', 'Бесплатно')}${tr('clock', 'Около 5 минут')}${tr('flask', 'Любая лаборатория')}</div>
     </div>
-    <div class="lnd-ill" aria-hidden="true">
+    <div class="lnd-ill" aria-hidden="true"><div class="lnd-stage">
       <div class="lnd-sheet">${sheet}</div>
       <div class="lnd-card">
         <div class="lnd-row"><span class="t-l">Ферритин</span><span class="chip off">низкий</span></div>
         ${ln('С чем это связано')}${ln('Какие риски и как их снизить')}${ln('Что досдать, к кому идти')}
       </div>
-    </div>`;
+    </div></div>`;
 }
 function sheetUpload() {
   const src = (ic, t) => `<button class="card" data-files style="margin:0;padding:14px 6px;display:grid;justify-items:center;gap:6px;background:var(--bg-base)"><span class="ic brand">${icon(ic)}</span><span class="t-l">${t}</span></button>`;
@@ -1201,7 +1207,7 @@ function vOrders() {
 function checkQCard() {
   const qs = ckQs(), cur = qs.find(q => !state.answers[q.id]);
   if (S().old || !qs.length) return '';
-  if (!cur) return `<div class="card qdone"><span class="ic" style="background:var(--success);color:#fff">${icon('check')}</span><div style="flex:1"><p class="t-xl">Ответы учтены</p><p class="b-l muted">Разбор учтёт их при чтении показателей</p></div><button class="link b-l" data-ckreset>Изменить</button></div>`;
+  if (!cur) return `<div class="card qdone"><span class="ic" style="background:var(--success);color:#fff">${icon('check')}</span><div style="flex:1"><p class="t-xl">Ответы учтены</p><p class="b-l muted">Учтём ответы в возможных причинах</p></div><button class="link b-l" data-ckreset>Изменить</button></div>`;
   const k = qs.indexOf(cur) + 1, n = qs.length;
   return `<div class="qcard">
     <div class="top"><span class="caps">Вопросы для уточнения</span><span class="b-m muted num">${k} из ${n}</span></div>
@@ -1498,7 +1504,7 @@ function bottomBar() {
   if (state.screen === 'start') return `<div class="bar"><button class="btn" data-upload>Загрузить бланк</button><button class="btn btn-sec" data-mine>Мои анализы в Lab4U</button><p class="fine">Не заменяет консультацию врача · для взрослых 18+</p></div>`;
   if (state.screen === 'check') {
     const left = S().old ? 0 : ckQs().filter(q => !state.answers[q.id]).length;
-    return `<div class="bar"><button class="btn" data-confirm${left ? ' disabled' : ''}>Верно, получить разбор</button>${left ? `<p class="fine">Ответьте на вопросы выше, всего ${left} ${left === 1 ? 'остался' : 'осталось'}</p>` : ''}</div>`;
+    return `<div class="bar"><button class="btn" data-confirm${left ? ' disabled' : ''}>Верно, получить разбор</button>${left ? `<button class="fine" data-toq>Ответьте на вопросы для уточнения, всего ${left} ${left === 1 ? 'остался' : 'осталось'}</button>` : ''}</div>`;
   }
   if ((state.screen === 'summary' || state.screen === 'detail') && state.picked.size) {
     const n = state.picked.size;
@@ -1641,6 +1647,7 @@ document.addEventListener('click', e => {
   }
   if (d.tab) { const [sid, code] = d.tab.split('|'); state.tab = { ...(state.tab || {}), [sid]: code }; return render(); }
   if (d.sys) { state.sys = d.sys; state.tab = {}; state.sheet = 'theme'; return render(); }
+  if ('toq' in d) { document.querySelector('.qcard')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
   if ('who' in d) { state.sheet = 'who'; return render(); }
   if (d.wsex) { state.whoSex = d.wsex; return render(); }
   if (d.q) { state.answers[d.q] = d.a; return render(); }
