@@ -369,6 +369,8 @@
   .th-sh-head { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; padding-bottom: 8px; }
   .th-sh-head .title { text-align: center; font-size: 16px; line-height: 20px; font-weight: 600; }
   .th-sh-body h1 { margin-top: 4px !important; }
+  body.th-open .bar { z-index: 25; }
+  body.th-open.has-cart .th-sh-body { padding-bottom: 120px; }
   .ich .spin { width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid var(--brand-bg); border-top-color: var(--brand-base); flex: none; box-sizing: border-box; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .ich .spin { animation-duration: 2.4s; } }
@@ -1349,6 +1351,8 @@ function render() {
   const sheets = { upload: sheetUpload, files: sheetFiles, login: sheetLogin, cart: sheetCart, theme: sheetTheme };
   // при перерисовке открытая шторка не должна прыгать в начало
   const keepY = state.sheet && state.sheet === lastSheet ? document.querySelector('#sheet .sheet')?.scrollTop : 0;
+  // корзина видна и поверх шторки темы
+  document.body.classList.toggle('th-open', state.sheet === 'theme'); document.body.classList.toggle('has-cart', state.picked.size > 0);
   document.getElementById('sheet').innerHTML = sheets[state.sheet] ? sheets[state.sheet]() : '';
   if (keepY) document.querySelector('#sheet .sheet').scrollTop = keepY;
   if (state.sheet && state.sheet !== lastSheet) {
