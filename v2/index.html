@@ -342,6 +342,10 @@
   /* экран генерации разбора */
   body.gen-mode, body.gen-mode .page { background: var(--brand-base); }
   body.gen-mode { overflow: hidden; }
+  body.fit { overflow: hidden; overscroll-behavior: none; }
+  html:has(body.fit) { overflow: hidden; overscroll-behavior: none; }
+  body.fit .page { min-height: 0; }
+  body.fit .app { padding-bottom: 0; }
   body.gen-mode .app { padding-bottom: 0; }
   body.gen-mode .page { min-height: 0; }
   .gen { color: #fff; height: 100vh; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; padding: calc(16px + env(safe-area-inset-top)) 0 calc(40px + env(safe-area-inset-bottom)); box-sizing: border-box; }
@@ -1429,6 +1433,8 @@ function sheetCart() {
 function render() {
   const views = { start: vStart, orders: vOrders, upload: vUpload, check: vCheck, gen: vGen, summary: vSummary, detail: () => vDetail(state.sys) };
   document.body.classList.toggle('gen-mode', state.screen === 'gen');
+  // первый экран и чтение бланка помещаются целиком — без вертикального скролла
+  document.body.classList.toggle('fit', state.screen === 'start' || state.screen === 'upload');
   // лента карточек анализов не должна прыгать в начало после выбора
   const segX = {}; document.querySelectorAll('[data-seg]').forEach(e => { segX[e.dataset.seg] = e.scrollLeft; });
   document.getElementById('app').innerHTML = (views[state.screen] || vStart)();
