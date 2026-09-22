@@ -911,8 +911,7 @@ function topicsLine(sc) {
   return parts.join(', ') + (sc.urgent ? `. ${sc.urgent}` : '');
 }
 function datesLine(sc) {
-  const today = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-  return `Анализы от ${dateOf()}, расшифровка от ${today}`;
+  return `Анализы от ${dateOf()}`;
 }
 function themeGroups(sc) {
   const attn = sc.systems.filter(id => SYS_SUMMARY[id].level === 'attn' && sysStatus(sc, id) !== 'exp');
