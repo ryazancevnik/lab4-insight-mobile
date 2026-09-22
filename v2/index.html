@@ -331,6 +331,9 @@
   .srcdoc { display: block; margin-top: 4px; font-size: 12px; line-height: 16px; color: #00AACCA6; }
   .srcdoc svg { vertical-align: -2px; margin-right: 4px; }
   .srcs { margin: var(--s-12) var(--s-16) 0; }
+  .src-card { display: grid; grid-template-columns: 40px 1fr 20px; gap: 12px; align-items: center; margin-top: var(--s-12); background: var(--wrapper-a6); border-radius: var(--r-16, 16px); padding: 12px 14px; color: inherit; text-decoration: none; }
+  .src-ic { width: 40px; height: 40px; border-radius: 12px; background: var(--brand-bg); color: var(--brand-base); display: grid; place-items: center; }
+  .src-ext { color: var(--text-a56); display: grid; }
   .srcs .srcdoc { margin-top: 0; font-size: 13px; line-height: 18px; }
   .docph { display: block; width: 100%; height: 180px; object-fit: cover; object-position: 50% 30%; }
   .qcard + .card, .qcard + .act { margin-top: var(--s-12); }
@@ -1191,7 +1194,6 @@ function vSummary() {
     ${hasSys ? themeGroups(sc) : ''}
     ${hasSys && !sc.old ? `<div style="margin-top:var(--s-24)">${qCard(sc)}</div>` : ''}
     ${hasSys && !sc.old ? planBlock(sc) : ''}
-    <div class="cells" style="margin-top:var(--s-24)">${normList(sc)}</div>
 `;
 }
 
@@ -1404,7 +1406,7 @@ function vDetail(id) {
     <h2 class="t-3xl sec">Возможные причины</h2>
     ${qs}
     <div class="card"><ol class="causes">${causes}</ol></div>
-    ${srcs.length ? `<div class="srcs">${srcs.map(x => `<span class="srcdoc">${DOCSVG}${x}</span>`).join('')}</div>` : ''}
+    ${srcs.map(x => `<a class="src-card"><span class="src-ic">${DOCSVG.replace('width="14" height="14"', 'width="20" height="20"')}</span><div><p class="b-m muted">Источник</p><p class="t-l" style="margin-top:2px">${x}</p><p class="b-m muted" style="margin-top:2px">Минздрав России</p></div><span class="src-ext"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span></a>`).join('')}
     ${inline ? '' : moreHead + more}
     <h2 class="t-3xl sec">Когда нужно к врачу</h2>
     <p class="b-xl intro">${s.docIntro}</p>
